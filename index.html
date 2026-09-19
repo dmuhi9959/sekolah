@@ -37,12 +37,10 @@
   #wallpaper-layer::after { content: ''; position: absolute; inset: 0; background: var(--bg-overlay); backdrop-filter: blur(3px); }
   #wallpaper-video { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; display: none; }
   #wallpaper-video.active { display: block; }
-
   #youtube-bg { position: fixed; inset: 0; z-index: 0; display: none; overflow: hidden; }
   #youtube-bg.active { display: block; }
   #youtube-bg iframe { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100vw; height: 56.25vw; min-height: 100vh; min-width: 177.78vh; border: 0; z-index: 1; pointer-events: none; }
   #youtube-overlay { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
-
   .pattern-overlay { position: fixed; inset: 0; z-index: 1; pointer-events: none; background-image: radial-gradient(circle at 15% 25%, rgba(var(--primary-rgb), 0.18) 0%, transparent 40%), radial-gradient(circle at 85% 75%, rgba(var(--accent-rgb), 0.12) 0%, transparent 40%); }
   .pattern-overlay::before { content: ''; position: absolute; inset: 0; background-image: repeating-linear-gradient(45deg, transparent, transparent 60px, rgba(255,255,255,0.02) 60px, rgba(255,255,255,0.02) 61px), repeating-linear-gradient(-45deg, transparent, transparent 60px, rgba(255,255,255,0.02) 60px, rgba(255,255,255,0.02) 61px); }
   .particles { position: fixed; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
@@ -105,6 +103,8 @@
   .building-image .slide.active { opacity: 1; }
   .building-image .slide-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1.5s ease; }
   .building-image .slide-video.active { opacity: 1; }
+  .building-image .slide-yt { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; opacity: 0; transition: opacity 1.5s ease; }
+  .building-image .slide-yt.active { opacity: 1; }
   .building-image::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 50%, rgba(var(--bg-solid-rgb), 0.9)); pointer-events: none; z-index: 2; }
   .slide-indicators { position: absolute; top: 12px; right: 12px; display: flex; gap: 6px; z-index: 3; }
   .slide-indicator { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.4); transition: var(--transition); }
@@ -189,6 +189,8 @@
   .slide-slot .slot-content p { font-size: 0.7rem; color: var(--text-muted); }
   .slide-slot .remove-btn { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; background: rgba(255, 82, 82, 0.9); color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 0.65rem; z-index: 2; display: flex; align-items: center; justify-content: center; }
   .slide-slot .media-badge { position: absolute; bottom: 4px; left: 4px; padding: 2px 8px; background: rgba(0, 0, 0, 0.7); border-radius: 50px; font-size: 0.6rem; color: var(--accent); z-index: 2; display: flex; align-items: center; gap: 3px; }
+  .slide-slot .yt-preview { width: 100%; height: 100%; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #000; }
+  .slide-slot .yt-preview i { font-size: 2rem; color: #ff0000; }
   .bell-slot { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
   .bell-slot .bell-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
   .bell-slot .bell-name { font-size: 0.95rem; font-weight: 700; color: var(--accent); display: flex; align-items: center; gap: 8px; }
@@ -381,21 +383,35 @@
       <button class="btn btn-secondary btn-block" id="resetTheme" style="margin-top:8px;"><i class="fas fa-undo"></i> Reset Default</button>
     </div>
     <div class="settings-section" id="tab-wallpaper">
-      <div class="form-group"><label>Slideshow Foto & Video (maks 3)</label><div class="slideshow-grid" id="slideshowGrid"></div></div>
-      <div class="form-group"><label>Interval Ganti Slide</label><div class="slider-container"><input type="range" class="slider" id="slideIntervalSlider" min="3" max="30" value="8"><div class="slider-value" id="slideIntervalValue">8 dtk</div></div></div>
+      <div class="form-group">
+        <label>Slideshow Foto, Video & YouTube (maks 3)</label>
+        <div class="slideshow-grid" id="slideshowGrid"></div>
+      </div>
+      <div class="form-group">
+        <label><i class="fab fa-youtube" style="color:#ff0000;"></i> Tambah Video YouTube ke Slideshow</label>
+        <div style="display:flex;gap:8px;">
+          <select class="form-control" id="ytSlotSelect" style="width:auto;">
+            <option value="0">Slot 1</option>
+            <option value="1">Slot 2</option>
+            <option value="2">Slot 3</option>
+          </select>
+          <input type="text" class="form-control" id="ytSlideUrl" placeholder="https://www.youtube.com/watch?v=...">
+        </div>
+        <button class="btn btn-secondary btn-block" id="addYtSlide" style="margin-top:8px;"><i class="fab fa-youtube"></i> Tambah YouTube ke Slideshow</button>
+      </div>
+      <div class="form-group">
+        <label>Interval Ganti Slide</label>
+        <div class="slider-container"><input type="range" class="slider" id="slideIntervalSlider" min="3" max="30" value="8"><div class="slider-value" id="slideIntervalValue">8 dtk</div></div>
+      </div>
       <hr style="border:0;border-top:1px solid var(--card-border);margin:16px 0;">
       <div class="form-group">
         <label><i class="fab fa-youtube" style="color:#ff0000;"></i> Link YouTube Background</label>
         <input type="text" class="form-control" id="youtubeUrlInput" placeholder="https://www.youtube.com/watch?v=...">
-        <button class="btn btn-secondary btn-block" id="applyYoutube" style="margin-top:8px;"><i class="fab fa-youtube"></i> Terapkan YouTube</button>
+        <button class="btn btn-secondary btn-block" id="applyYoutube" style="margin-top:8px;"><i class="fab fa-youtube"></i> Terapkan YouTube Background</button>
       </div>
       <div class="form-group">
         <label>Transparansi Video YouTube</label>
-        <div class="slider-container">
-          <input type="range" class="slider" id="ytOverlaySlider" min="0" max="80" value="30">
-          <div class="slider-value" id="ytOverlayValue">30%</div>
-        </div>
-        <p style="font-size:0.7rem;color:var(--text-muted);margin-top:6px;">Semakin rendah = video lebih terlihat. Semakin tinggi = lebih gelap.</p>
+        <div class="slider-container"><input type="range" class="slider" id="ytOverlaySlider" min="0" max="80" value="30"><div class="slider-value" id="ytOverlayValue">30%</div></div>
       </div>
       <button class="btn btn-danger btn-block" id="clearYoutube"><i class="fas fa-times"></i> Hapus YouTube Background</button>
       <hr style="border:0;border-top:1px solid var(--card-border);margin:16px 0;">
@@ -437,50 +453,36 @@
 
 <script>
 const themes = [
-  { id:'islamic-green', name:'Hijau Islamic', bgSolid:'#061512', bgOverlay:'#061810', primary:'#1a8a6f', primaryDark:'#0d5240', primaryLight:'#4dd0a8', accent:'#f4c430', accent2:'#ffd966', accent3:'#ff8c42' },
-  { id:'royal-blue', name:'Biru Royal', bgSolid:'#080f23', bgOverlay:'#0a1530', primary:'#2563eb', primaryDark:'#1e40af', primaryLight:'#60a5fa', accent:'#fbbf24', accent2:'#fcd34d', accent3:'#f97316' },
-  { id:'royal-purple', name:'Ungu Royal', bgSolid:'#140a23', bgOverlay:'#1a1030', primary:'#7c3aed', primaryDark:'#5b21b6', primaryLight:'#a78bfa', accent:'#fbbf24', accent2:'#fde047', accent3:'#fb7185' },
-  { id:'sunset-orange', name:'Sunset Orange', bgSolid:'#1e0f05', bgOverlay:'#2a1505', primary:'#ea580c', primaryDark:'#9a3412', primaryLight:'#fb923c', accent:'#facc15', accent2:'#fde047', accent3:'#dc2626' },
-  { id:'crimson-red', name:'Merah Crimson', bgSolid:'#1e0505', bgOverlay:'#2a0808', primary:'#dc2626', primaryDark:'#991b1b', primaryLight:'#f87171', accent:'#fbbf24', accent2:'#fcd34d', accent3:'#f97316' },
-  { id:'teal-ocean', name:'Teal Ocean', bgSolid:'#05191e', bgOverlay:'#05252a', primary:'#0d9488', primaryDark:'#115e59', primaryLight:'#5eead4', accent:'#f59e0b', accent2:'#fbbf24', accent3:'#fb7185' },
-  { id:'dark-gold', name:'Emas Gelap', bgSolid:'#140f05', bgOverlay:'#1a1508', primary:'#a16207', primaryDark:'#713f12', primaryLight:'#fde047', accent:'#facc15', accent2:'#fde047', accent3:'#ea580c' },
-  { id:'midnight-indigo', name:'Indigo Malam', bgSolid:'#0a0a1e', bgOverlay:'#0e1030', primary:'#4338ca', primaryDark:'#312e81', primaryLight:'#818cf8', accent:'#22d3ee', accent2:'#67e8f9', accent3:'#f472b6' }
+  {id:'islamic-green',name:'Hijau Islamic',bgSolid:'#061512',bgOverlay:'#061810',primary:'#1a8a6f',primaryDark:'#0d5240',primaryLight:'#4dd0a8',accent:'#f4c430',accent2:'#ffd966',accent3:'#ff8c42'},
+  {id:'royal-blue',name:'Biru Royal',bgSolid:'#080f23',bgOverlay:'#0a1530',primary:'#2563eb',primaryDark:'#1e40af',primaryLight:'#60a5fa',accent:'#fbbf24',accent2:'#fcd34d',accent3:'#f97316'},
+  {id:'royal-purple',name:'Ungu Royal',bgSolid:'#140a23',bgOverlay:'#1a1030',primary:'#7c3aed',primaryDark:'#5b21b6',primaryLight:'#a78bfa',accent:'#fbbf24',accent2:'#fde047',accent3:'#fb7185'},
+  {id:'sunset-orange',name:'Sunset Orange',bgSolid:'#1e0f05',bgOverlay:'#2a1505',primary:'#ea580c',primaryDark:'#9a3412',primaryLight:'#fb923c',accent:'#facc15',accent2:'#fde047',accent3:'#dc2626'},
+  {id:'crimson-red',name:'Merah Crimson',bgSolid:'#1e0505',bgOverlay:'#2a0808',primary:'#dc2626',primaryDark:'#991b1b',primaryLight:'#f87171',accent:'#fbbf24',accent2:'#fcd34d',accent3:'#f97316'},
+  {id:'teal-ocean',name:'Teal Ocean',bgSolid:'#05191e',bgOverlay:'#05252a',primary:'#0d9488',primaryDark:'#115e59',primaryLight:'#5eead4',accent:'#f59e0b',accent2:'#fbbf24',accent3:'#fb7185'},
+  {id:'dark-gold',name:'Emas Gelap',bgSolid:'#140f05',bgOverlay:'#1a1508',primary:'#a16207',primaryDark:'#713f12',primaryLight:'#fde047',accent:'#facc15',accent2:'#fde047',accent3:'#ea580c'},
+  {id:'midnight-indigo',name:'Indigo Malam',bgSolid:'#0a0a1e',bgOverlay:'#0e1030',primary:'#4338ca',primaryDark:'#312e81',primaryLight:'#818cf8',accent:'#22d3ee',accent2:'#67e8f9',accent3:'#f472b6'}
 ];
-const colorPresets = {
-  bgSolid: ['#061512','#080f23','#140a23','#1e0f05','#1e0505','#05191e','#140f05','#0a0a1e','#1a1a2e','#000000','#0d1b2a','#1b263b','#0f0f1e','#1a0b2e','#0a1f1a'],
-  primary: ['#1a8a6f','#2563eb','#7c3aed','#ea580c','#dc2626','#0d9488','#a16207','#4338ca','#059669','#0891b2','#7c2d12','#9333ea','#0284c7','#16a34a','#ca8a04'],
-  accent: ['#f4c430','#fbbf24','#22d3ee','#a78bfa','#f97316','#10b981','#ec4899','#06b6d4','#84cc16','#f59e0b','#ef4444','#8b5cf6','#14b8a6','#facc15','#fb7185']
+const colorPresets={
+  bgSolid:['#061512','#080f23','#140a23','#1e0f05','#1e0505','#05191e','#140f05','#0a0a1e','#1a1a2e','#000000','#0d1b2a','#1b263b','#0f0f1e','#1a0b2e','#0a1f1a'],
+  primary:['#1a8a6f','#2563eb','#7c3aed','#ea580c','#dc2626','#0d9488','#a16207','#4338ca','#059669','#0891b2','#7c2d12','#9333ea','#0284c7','#16a34a','#ca8a04'],
+  accent:['#f4c430','#fbbf24','#22d3ee','#a78bfa','#f97316','#10b981','#ec4899','#06b6d4','#84cc16','#f59e0b','#ef4444','#8b5cf6','#14b8a6','#facc15','#fb7185']
 };
 
-const state = {
-  school: { name:'PPTQ JASMA DIGITAL', address:'Jl. Pendidikan No. 123, Indonesia', website:'www.pptq-jasma.sch.id', logo:'PJ', arabic:'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ', motto:'Belajar • Beriman • Beramal' },
-  theme: 'islamic-green',
-  customColors: { bgSolid:'#061512', bgOverlay:'#061810', primary:'#1a8a6f', primaryDark:'#0d5240', primaryLight:'#4dd0a8', accent:'#f4c430', accent2:'#ffd966', accent3:'#ff8c42' },
-  wallpaper: { type:'preset', value:'gradient1', custom:null, overlay:82 },
-  bgVideo: null,
-  youtubeUrl: '',
-  ytOverlay: 30,
-  slideshow: { media:[], interval:8, currentIndex:0 },
-  building: { title:'Gedung Utama Sekolah', subtitle:'Pusat kegiatan belajar mengajar' },
-  volume: 80,
-  announcements: { left:'Seluruh siswa wajib berpakaian seragam lengkap, rapi, dan bersepatu hitam saat masuk sekolah.', right:'Awal pendaftaran siswa ber 57 hari lagi. Hubungi panitia penerimaan siswa baru di ruang TU.' },
-  bells: {
-    'masuk':{time:'07:00',label:'Jam Masuk Sekolah',music:null,musicName:'',enabled:true},
-    'istirahat1':{time:'09:30',label:'Jam Istirahat 1',music:null,musicName:'',enabled:true},
-    'ganti1':{time:'09:45',label:'Ganti Pelajaran 1',music:null,musicName:'',enabled:true},
-    'ganti2':{time:'10:45',label:'Ganti Pelajaran 2',music:null,musicName:'',enabled:true},
-    'istirahat2':{time:'11:30',label:'Jam Istirahat 2',music:null,musicName:'',enabled:true},
-    'ganti3':{time:'12:30',label:'Ganti Pelajaran 3',music:null,musicName:'',enabled:true},
-    'ganti4':{time:'13:30',label:'Ganti Pelajaran 4',music:null,musicName:'',enabled:true},
-    'ganti5':{time:'14:30',label:'Ganti Pelajaran 5',music:null,musicName:'',enabled:true},
-    'pulang':{time:'15:30',label:'Jam Pulang Sekolah',music:null,musicName:'',enabled:true}
-  },
-  bellTriggered:{},
-  alarms:[],
-  schedules:[]
+const state={
+  school:{name:'PPTQ JASMA DIGITAL',address:'Jl. Pendidikan No. 123, Indonesia',website:'www.pptq-jasma.sch.id',logo:'PJ',arabic:'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',motto:'Belajar • Beriman • Beramal'},
+  theme:'islamic-green',
+  customColors:{bgSolid:'#061512',bgOverlay:'#061810',primary:'#1a8a6f',primaryDark:'#0d5240',primaryLight:'#4dd0a8',accent:'#f4c430',accent2:'#ffd966',accent3:'#ff8c42'},
+  wallpaper:{type:'preset',value:'gradient1',custom:null,overlay:82},
+  bgVideo:null,youtubeUrl:'',ytOverlay:30,
+  slideshow:{media:[],interval:8,currentIndex:0},
+  building:{title:'Gedung Utama Sekolah',subtitle:'Pusat kegiatan belajar mengajar'},
+  volume:80,
+  announcements:{left:'Seluruh siswa wajib berpakaian seragam lengkap, rapi, dan bersepatu hitam saat masuk sekolah.',right:'Awal pendaftaran siswa ber 57 hari lagi. Hubungi panitia penerimaan siswa baru di ruang TU.'},
+  bells:{'masuk':{time:'07:00',label:'Jam Masuk Sekolah',music:null,musicName:'',enabled:true},'istirahat1':{time:'09:30',label:'Jam Istirahat 1',music:null,musicName:'',enabled:true},'ganti1':{time:'09:45',label:'Ganti Pelajaran 1',music:null,musicName:'',enabled:true},'ganti2':{time:'10:45',label:'Ganti Pelajaran 2',music:null,musicName:'',enabled:true},'istirahat2':{time:'11:30',label:'Jam Istirahat 2',music:null,musicName:'',enabled:true},'ganti3':{time:'12:30',label:'Ganti Pelajaran 3',music:null,musicName:'',enabled:true},'ganti4':{time:'13:30',label:'Ganti Pelajaran 4',music:null,musicName:'',enabled:true},'ganti5':{time:'14:30',label:'Ganti Pelajaran 5',music:null,musicName:'',enabled:true},'pulang':{time:'15:30',label:'Jam Pulang Sekolah',music:null,musicName:'',enabled:true}},
+  bellTriggered:{},alarms:[],schedules:[]
 };
 
-const presetWallpapers = [
+const presetWallpapers=[
   {id:'gradient1',name:'Islamic Green',url:'linear-gradient(135deg, #0d5240, #1a8a6f, #4dd0a8)',type:'gradient'},
   {id:'gradient2',name:'Sunrise Amber',url:'linear-gradient(135deg, #1a1a2e, #c9a25c, #e8b04b)',type:'gradient'},
   {id:'gradient3',name:'Deep Ocean',url:'linear-gradient(135deg, #0c3559, #117eb0, #6dd5ed)',type:'gradient'},
@@ -491,7 +493,7 @@ const presetWallpapers = [
   {id:'photo3',name:'Classroom',url:'https://images.unsplash.com/photo-1580582932707-520aed937d7b?w=1920',type:'image'},
   {id:'photo4',name:'Mosque',url:'https://images.unsplash.com/photo-1542818831-43c7f87d5d0d?w=1920',type:'image'}
 ];
-const defaultSchedules = [
+const defaultSchedules=[
   {id:1,class:'KELAS 7-1',subject:'B. JERMAN',start:'05:30',end:'06:30',column:'left'},
   {id:2,class:'KELAS 7-2',subject:'B. ARAB',start:'05:30',end:'07:15',column:'left'},
   {id:3,class:'KELAS 7-3',subject:'TAHSIN',start:'06:30',end:'07:30',column:'left'},
@@ -504,7 +506,7 @@ const defaultSchedules = [
   {id:10,class:'KELAS 9-2',subject:'PKn',start:'09:00',end:'10:30',column:'right'}
 ];
 
-function saveState(){try{const s=JSON.parse(JSON.stringify(state));if(JSON.stringify(s).length>4000000){s.wallpaper.custom=null;s.bgVideo=null;s.slideshow.media=s.slideshow.media.map(m=>(m&&m.startsWith('data:')&&m.length>500000)?null:m);Object.keys(s.bells).forEach(k=>{if(s.bells[k].music&&s.bells[k].music.length>500000)s.bells[k].music=null;});s.alarms=s.alarms.map(a=>{if(a.music&&a.music.length>500000)a.music=null;return a;});}localStorage.setItem('pptqDisplayState',JSON.stringify(s));}catch(e){console.warn('Save failed:',e);}}
+function saveState(){try{const s=JSON.parse(JSON.stringify(state));if(JSON.stringify(s).length>4000000){s.wallpaper.custom=null;s.bgVideo=null;s.slideshow.media=s.slideshow.media.map(m=>{if(m&&(m.startsWith('data:')&&m.length>500000))return null;return m;});Object.keys(s.bells).forEach(k=>{if(s.bells[k].music&&s.bells[k].music.length>500000)s.bells[k].music=null;});s.alarms=s.alarms.map(a=>{if(a.music&&a.music.length>500000)a.music=null;return a;});}localStorage.setItem('pptqDisplayState',JSON.stringify(s));}catch(e){console.warn('Save failed:',e);}}
 function loadState(){const saved=localStorage.getItem('pptqDisplayState');if(saved){try{Object.assign(state,JSON.parse(saved));const db={'masuk':{time:'07:00',label:'Jam Masuk Sekolah',music:null,musicName:'',enabled:true},'istirahat1':{time:'09:30',label:'Jam Istirahat 1',music:null,musicName:'',enabled:true},'ganti1':{time:'09:45',label:'Ganti Pelajaran 1',music:null,musicName:'',enabled:true},'ganti2':{time:'10:45',label:'Ganti Pelajaran 2',music:null,musicName:'',enabled:true},'istirahat2':{time:'11:30',label:'Jam Istirahat 2',music:null,musicName:'',enabled:true},'ganti3':{time:'12:30',label:'Ganti Pelajaran 3',music:null,musicName:'',enabled:true},'ganti4':{time:'13:30',label:'Ganti Pelajaran 4',music:null,musicName:'',enabled:true},'ganti5':{time:'14:30',label:'Ganti Pelajaran 5',music:null,musicName:'',enabled:true},'pulang':{time:'15:30',label:'Jam Pulang Sekolah',music:null,musicName:'',enabled:true}};if(!state.bells)state.bells=db;Object.keys(db).forEach(k=>{if(!state.bells[k])state.bells[k]=db[k];});if(!state.customColors){const t=themes[0];state.customColors={bgSolid:t.bgSolid,bgOverlay:t.bgOverlay,primary:t.primary,primaryDark:t.primaryDark,primaryLight:t.primaryLight,accent:t.accent,accent2:t.accent2,accent3:t.accent3};}if(!state.slideshow)state.slideshow={media:[],interval:8,currentIndex:0};if(state.slideshow.images&&!state.slideshow.media)state.slideshow.media=state.slideshow.images;if(!state.slideshow.media)state.slideshow.media=[];if(state.ytOverlay===undefined)state.ytOverlay=30;}catch(e){console.error('Load error',e);}}if(!state.schedules||state.schedules.length===0)state.schedules=defaultSchedules;}
 
 function hexToRgb(hex){return{r:parseInt(hex.slice(1,3),16),g:parseInt(hex.slice(3,5),16),b:parseInt(hex.slice(5,7),16)};}
@@ -536,57 +538,38 @@ function stopAlarmAudio(){if(alarmAudio){try{alarmAudio.pause();alarmAudio.curre
 function stopAlarm(){stopAlarmAudio();document.body.classList.remove('bell-active');document.getElementById('alarmModal').classList.remove('show');}
 function updateAlarmList(){const list=document.getElementById('alarmList');list.innerHTML=state.alarms.length===0?'<p style="text-align:center;color:var(--text-muted);padding:20px;">Belum ada alarm</p>':state.alarms.map(a=>`<div class="alarm-item"><div class="alarm-info"><div class="alarm-time">${a.time}</div><div class="alarm-details">${a.label||'Alarm'} ${a.musicName?'• '+a.musicName:'• Default beep'}</div></div><div class="alarm-actions"><div class="toggle-switch ${a.enabled?'active':''}" data-id="${a.id}" data-action="toggle"></div><button class="icon-btn" data-id="${a.id}" data-action="test"><i class="fas fa-play"></i></button><button class="icon-btn" data-id="${a.id}" data-action="delete" style="color:var(--danger);"><i class="fas fa-trash"></i></button></div></div>`).join('');}
 
-// ===== YOUTUBE FIX =====
+// YOUTUBE helpers
 function parseYouTubeUrl(url){if(!url)return null;const patterns=[/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/];for(const p of patterns){const m=url.match(p);if(m)return m[1];}return null;}
+function applyYtOverlay(){const overlay=document.getElementById('youtube-overlay');const c=state.customColors;const rgb=hexToRgb(c.bgSolid);overlay.style.background=`rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${state.ytOverlay/100})`;}
 
-function applyYtOverlay(){
-  const overlay = document.getElementById('youtube-overlay');
-  const c = state.customColors;
-  const rgb = hexToRgb(c.bgSolid);
-  overlay.style.background = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${state.ytOverlay/100})`;
-}
-
-function applyBackground(){
-  const wpLayer=document.getElementById('wallpaper-layer');
-  const wpVideo=document.getElementById('wallpaper-video');
-  const ytBg=document.getElementById('youtube-bg');
-  const ytIframe=document.getElementById('youtube-iframe');
-
-  // YOUTUBE DULU
-  if(state.youtubeUrl){
-    const vid=parseYouTubeUrl(state.youtubeUrl);
-    if(vid){
-      ytIframe.src=`https://www.youtube.com/embed/${vid}?autoplay=1&mute=1&loop=1&playlist=${vid}&controls=0&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1&enablejsapi=1`;
-      ytBg.classList.add('active');
-      wpLayer.style.display='none';
-      wpVideo.classList.remove('active');wpVideo.pause();
-      applyYtOverlay();
-      return;
-    }
-  }
-  ytBg.classList.remove('active');
-  ytIframe.src='';
-
-  if(state.bgVideo){
-    wpVideo.src=state.bgVideo;
-    wpVideo.classList.add('active');
-    wpVideo.play().catch(()=>{});
-    wpLayer.style.display='none';
-    return;
-  }
-  wpVideo.classList.remove('active');wpVideo.pause();wpVideo.removeAttribute('src');
-  wpLayer.style.display='block';
-  applyTheme();
-  if(state.wallpaper.type==='preset'){const preset=presetWallpapers.find(w=>w.id===state.wallpaper.value);if(preset){if(preset.type==='gradient'){wpLayer.style.background=preset.url;wpLayer.style.backgroundImage='none';}else{wpLayer.style.backgroundImage=`url("${preset.url}")`;}}}else if(state.wallpaper.type==='url'){wpLayer.style.backgroundImage=`url("${state.wallpaper.value}")`;}else if(state.wallpaper.type==='custom'&&state.wallpaper.custom){wpLayer.style.backgroundImage=`url("${state.wallpaper.custom}")`;}
-}
-
+function applyBackground(){const wpLayer=document.getElementById('wallpaper-layer'),wpVideo=document.getElementById('wallpaper-video'),ytBg=document.getElementById('youtube-bg'),ytIframe=document.getElementById('youtube-iframe');if(state.youtubeUrl){const vid=parseYouTubeUrl(state.youtubeUrl);if(vid){ytIframe.src=`https://www.youtube.com/embed/${vid}?autoplay=1&mute=1&loop=1&playlist=${vid}&controls=0&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1&enablejsapi=1`;ytBg.classList.add('active');wpLayer.style.display='none';wpVideo.classList.remove('active');wpVideo.pause();applyYtOverlay();return;}}ytBg.classList.remove('active');ytIframe.src='';if(state.bgVideo){wpVideo.src=state.bgVideo;wpVideo.classList.add('active');wpVideo.play().catch(()=>{});wpLayer.style.display='none';return;}wpVideo.classList.remove('active');wpVideo.pause();wpVideo.removeAttribute('src');wpLayer.style.display='block';applyTheme();if(state.wallpaper.type==='preset'){const preset=presetWallpapers.find(w=>w.id===state.wallpaper.value);if(preset){if(preset.type==='gradient'){wpLayer.style.background=preset.url;wpLayer.style.backgroundImage='none';}else{wpLayer.style.backgroundImage=`url("${preset.url}")`;}}}else if(state.wallpaper.type==='url'){wpLayer.style.backgroundImage=`url("${state.wallpaper.value}")`;}else if(state.wallpaper.type==='custom'&&state.wallpaper.custom){wpLayer.style.backgroundImage=`url("${state.wallpaper.custom}")`;}}
 function renderWallpaperGrid(){document.getElementById('wallpaperGrid').innerHTML=presetWallpapers.map(w=>`<div class="wallpaper-item ${state.wallpaper.type==='preset'&&state.wallpaper.value===w.id?'active':''}" data-id="${w.id}">${w.type==='gradient'?`<div class="gradient-preview" style="background:${w.url};"></div>`:`<img src="${w.url}" alt="${w.name}" loading="lazy">`}<div class="check"><i class="fas fa-check"></i></div></div>`).join('');}
 
+// SLIDESHOW - support foto, video, dan YouTube
 let slideshowInterval=null;
 function isVideoMedia(d){return d&&d.startsWith('data:video');}
-function renderBuildingSlides(){const c=document.getElementById('buildingImage'),ind=document.getElementById('slideIndicators');c.querySelectorAll('.slide, .slide-video').forEach(s=>s.remove());const media=state.slideshow.media.filter(Boolean);if(media.length===0){const s=document.createElement('div');s.className='slide active';s.style.backgroundImage=`url("https://images.unsplash.com/photo-1562774053-701439336967?w=1200")`;c.insertBefore(s,c.firstChild);ind.innerHTML='';}else{media.forEach((item,idx)=>{const isActive=idx===state.slideshow.currentIndex;let slide;if(isVideoMedia(item)){slide=document.createElement('video');slide.className='slide-video'+(isActive?' active':'');slide.src=item;slide.muted=true;slide.loop=true;slide.playsInline=true;slide.autoplay=true;if(isActive)slide.play().catch(()=>{});}else{slide=document.createElement('div');slide.className='slide'+(isActive?' active':'');slide.style.backgroundImage=`url("${item}")`;}c.insertBefore(slide,c.firstChild);});ind.innerHTML=media.map((_,idx)=>`<div class="slide-indicator ${idx===state.slideshow.currentIndex?'active':''}"></div>`).join('');}}
-function startSlideshow(){if(slideshowInterval)clearInterval(slideshowInterval);const media=state.slideshow.media.filter(Boolean);if(media.length<=1)return;slideshowInterval=setInterval(()=>{const imgs=state.slideshow.media.filter(Boolean);if(imgs.length<=1)return;state.slideshow.currentIndex=(state.slideshow.currentIndex+1)%imgs.length;document.querySelectorAll('#buildingImage .slide, #buildingImage .slide-video').forEach((s,idx)=>{const a=idx===state.slideshow.currentIndex;s.classList.toggle('active',a);if(s.tagName==='VIDEO'){if(a)s.play().catch(()=>{});else s.pause();}});document.querySelectorAll('#slideIndicators .slide-indicator').forEach((ind,idx)=>ind.classList.toggle('active',idx===state.slideshow.currentIndex));},state.slideshow.interval*1000);}
-function renderSlideshowGrid(){const grid=document.getElementById('slideshowGrid');const slots=[];for(let i=0;i<3;i++){const item=state.slideshow.media[i];const isVid=isVideoMedia(item);let content;if(item){if(isVid)content=`<video src="${item}" muted preload="metadata"></video><button class="remove-btn" data-remove="${i}"><i class="fas fa-times"></i></button><div class="media-badge"><i class="fas fa-video"></i> Video</div>`;else content=`<img src="${item}" alt="Slide ${i+1}"><button class="remove-btn" data-remove="${i}"><i class="fas fa-times"></i></button><div class="media-badge"><i class="fas fa-image"></i> Foto</div>`;}else content=`<div class="slot-content"><i class="fas fa-plus"></i><p>Foto/Video ${i+1}</p></div>`;slots.push(`<div class="slide-slot" data-slot="${i}">${content}<input type="file" accept="image/*,video/*" data-slot="${i}" style="display:none;"></div>`);}grid.innerHTML=slots.join('');grid.querySelectorAll('.slide-slot').forEach(slot=>{const fi=slot.querySelector('input[type="file"]');slot.addEventListener('click',e=>{if(!e.target.closest('.remove-btn'))fi.click();});fi.addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const isVid=f.type.startsWith('video/');const max=isVid?20*1024*1024:5*1024*1024;if(f.size>max){showToast(`File terlalu besar (max ${isVid?'20MB':'5MB'})`,'error');return;}const idx=parseInt(fi.dataset.slot);const r=new FileReader();r.onload=ev=>{if(!state.slideshow.media)state.slideshow.media=[];state.slideshow.media[idx]=ev.target.result;renderSlideshowGrid();renderBuildingSlides();startSlideshow();saveState();showToast(isVid?'Video ditambahkan':'Foto ditambahkan','success');};r.readAsDataURL(f);});});grid.querySelectorAll('.remove-btn').forEach(btn=>{btn.addEventListener('click',e=>{e.stopPropagation();const idx=parseInt(btn.dataset.remove);state.slideshow.media[idx]=null;state.slideshow.media=state.slideshow.media.filter(Boolean);state.slideshow.currentIndex=0;renderSlideshowGrid();renderBuildingSlides();startSlideshow();saveState();showToast('Media dihapus','info');});});}
+function isYouTubeMedia(d){return d&&d.startsWith('yt:');}
+function getYouTubeId(d){return d.substring(3);}
+
+function renderBuildingSlides(){const c=document.getElementById('buildingImage'),ind=document.getElementById('slideIndicators');c.querySelectorAll('.slide, .slide-video, .slide-yt').forEach(s=>s.remove());const media=state.slideshow.media.filter(Boolean);if(media.length===0){const s=document.createElement('div');s.className='slide active';s.style.backgroundImage=`url("https://images.unsplash.com/photo-1562774053-701439336967?w=1200")`;c.insertBefore(s,c.firstChild);ind.innerHTML='';}else{media.forEach((item,idx)=>{const isActive=idx===state.slideshow.currentIndex;let slide;if(isYouTubeMedia(item)){const vid=getYouTubeId(item);slide=document.createElement('iframe');slide.className='slide-yt'+(isActive?' active':'');slide.src=`https://www.youtube.com/embed/${vid}?autoplay=1&mute=1&loop=1&playlist=${vid}&controls=0&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1&enablejsapi=1`;slide.allow='autoplay; fullscreen; encrypted-media';slide.setAttribute('allowfullscreen','');}else if(isVideoMedia(item)){slide=document.createElement('video');slide.className='slide-video'+(isActive?' active':'');slide.src=item;slide.muted=true;slide.loop=true;slide.playsInline=true;slide.autoplay=true;if(isActive)slide.play().catch(()=>{});}else{slide=document.createElement('div');slide.className='slide'+(isActive?' active':'');slide.style.backgroundImage=`url("${item}")`;}c.insertBefore(slide,c.firstChild);});ind.innerHTML=media.map((_,idx)=>`<div class="slide-indicator ${idx===state.slideshow.currentIndex?'active':''}"></div>`).join('');}}
+
+function startSlideshow(){if(slideshowInterval)clearInterval(slideshowInterval);const media=state.slideshow.media.filter(Boolean);if(media.length<=1)return;slideshowInterval=setInterval(()=>{const imgs=state.slideshow.media.filter(Boolean);if(imgs.length<=1)return;state.slideshow.currentIndex=(state.slideshow.currentIndex+1)%imgs.length;document.querySelectorAll('#buildingImage .slide, #buildingImage .slide-video, #buildingImage .slide-yt').forEach((s,idx)=>{const a=idx===state.slideshow.currentIndex;s.classList.toggle('active',a);if(s.tagName==='VIDEO'){if(a)s.play().catch(()=>{});else s.pause();}});document.querySelectorAll('#slideIndicators .slide-indicator').forEach((ind,idx)=>ind.classList.toggle('active',idx===state.slideshow.currentIndex));},state.slideshow.interval*1000);}
+
+function renderSlideshowGrid(){const grid=document.getElementById('slideshowGrid');const slots=[];for(let i=0;i<3;i++){const item=state.slideshow.media[i];let content;if(item){if(isYouTubeMedia(item)){const vid=getYouTubeId(item);content=`<div class="yt-preview"><i class="fab fa-youtube"></i></div><button class="remove-btn" data-remove="${i}"><i class="fas fa-times"></i></button><div class="media-badge"><i class="fab fa-youtube" style="color:#ff0000;"></i> YouTube</div>`;}else if(isVideoMedia(item)){content=`<video src="${item}" muted preload="metadata"></video><button class="remove-btn" data-remove="${i}"><i class="fas fa-times"></i></button><div class="media-badge"><i class="fas fa-video"></i> Video</div>`;}else{content=`<img src="${item}" alt="Slide ${i+1}"><button class="remove-btn" data-remove="${i}"><i class="fas fa-times"></i></button><div class="media-badge"><i class="fas fa-image"></i> Foto</div>`;}}else{content=`<div class="slot-content"><i class="fas fa-plus"></i><p>Foto/Video ${i+1}</p></div>`;}slots.push(`<div class="slide-slot" data-slot="${i}">${content}<input type="file" accept="image/*,video/*" data-slot="${i}" style="display:none;"></div>`);}grid.innerHTML=slots.join('');grid.querySelectorAll('.slide-slot').forEach(slot=>{const fi=slot.querySelector('input[type="file"]');slot.addEventListener('click',e=>{if(!e.target.closest('.remove-btn'))fi.click();});fi.addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const isVid=f.type.startsWith('video/');const max=isVid?20*1024*1024:5*1024*1024;if(f.size>max){showToast(`File terlalu besar (max ${isVid?'20MB':'5MB'})`,'error');return;}const idx=parseInt(fi.dataset.slot);const r=new FileReader();r.onload=ev=>{if(!state.slideshow.media)state.slideshow.media=[];state.slideshow.media[idx]=ev.target.result;renderSlideshowGrid();renderBuildingSlides();startSlideshow();saveState();showToast(isVid?'Video ditambahkan':'Foto ditambahkan','success');};r.readAsDataURL(f);});});grid.querySelectorAll('.remove-btn').forEach(btn=>{btn.addEventListener('click',e=>{e.stopPropagation();const idx=parseInt(btn.dataset.remove);state.slideshow.media[idx]=null;state.slideshow.media=state.slideshow.media.filter(Boolean);state.slideshow.currentIndex=0;renderSlideshowGrid();renderBuildingSlides();startSlideshow();saveState();showToast('Media dihapus','info');});});}
+
+// Add YouTube to slideshow
+document.getElementById('addYtSlide').addEventListener('click',()=>{
+  const url=document.getElementById('ytSlideUrl').value.trim();
+  const slot=parseInt(document.getElementById('ytSlotSelect').value);
+  if(!url){showToast('Masukkan URL YouTube','error');return;}
+  const vid=parseYouTubeUrl(url);
+  if(!vid){showToast('URL YouTube tidak valid','error');return;}
+  if(!state.slideshow.media)state.slideshow.media=[];
+  state.slideshow.media[slot]='yt:'+vid;
+  document.getElementById('ytSlideUrl').value='';
+  renderSlideshowGrid();renderBuildingSlides();startSlideshow();saveState();
+  showToast('YouTube ditambahkan ke slideshow slot '+(slot+1),'success');
+});
 
 function createParticles(){const c=document.getElementById('particles');c.innerHTML='';for(let i=0;i<15;i++){const p=document.createElement('div');p.className='particle';const sz=Math.random()*4+2;p.style.width=sz+'px';p.style.height=sz+'px';p.style.left=Math.random()*100+'%';p.style.animationDuration=(Math.random()*20+15)+'s';p.style.animationDelay=Math.random()*20+'s';p.style.opacity=Math.random()*0.4+0.15;c.appendChild(p);}}
 function showToast(msg,type){type=type||'info';const t=document.getElementById('toast'),ic=t.querySelector('i');t.className='toast '+type;ic.className=type==='success'?'fas fa-check-circle':type==='error'?'fas fa-exclamation-circle':'fas fa-info-circle';document.getElementById('toastMessage').textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
@@ -596,7 +579,6 @@ function closeSettings(){document.getElementById('settingsOverlay').classList.re
 function updateScheduleListSettings(){const list=document.getElementById('scheduleListSettings');if(state.schedules.length===0){list.innerHTML='<p style="text-align:center;color:var(--text-muted);padding:20px;">Belum ada</p>';return;}list.innerHTML=[...state.schedules].sort((a,b)=>timeToMinutes(a.start)-timeToMinutes(b.start)).map(s=>`<div class="alarm-item"><div class="alarm-info"><div class="alarm-time">${s.start} - ${s.end}</div><div class="alarm-details">${s.class} • ${s.subject} • ${s.column==='left'?'Kiri':'Kanan'}</div></div><div class="alarm-actions"><button class="icon-btn" data-id="${s.id}" data-action="delete-schedule" style="color:var(--danger);"><i class="fas fa-trash"></i></button></div></div>`).join('');}
 function applySettings(){document.getElementById('schoolName').textContent=state.school.name;document.getElementById('schoolAddress').textContent=state.school.address;document.getElementById('schoolWebsite').textContent=state.school.website;document.getElementById('schoolLogo').textContent=state.school.logo;document.getElementById('arabicText').textContent=state.school.arabic;document.querySelector('.header-center .motto').textContent=state.school.motto;document.getElementById('footerAnnouncement1').textContent=state.announcements.left;document.getElementById('footerAnnouncement2').textContent=state.announcements.right;document.getElementById('buildingTitle').textContent=state.building.title;document.getElementById('buildingSubtitle').textContent=state.building.subtitle;}
 
-// EVENTS
 document.getElementById('openSettings').addEventListener('click',openSettings);
 document.getElementById('closeSettings').addEventListener('click',closeSettings);
 document.getElementById('settingsOverlay').addEventListener('click',closeSettings);
@@ -606,34 +588,19 @@ document.getElementById('saveGeneral').addEventListener('click',()=>{state.schoo
 document.getElementById('volumeSlider').addEventListener('input',e=>{state.volume=parseInt(e.target.value);document.getElementById('volumeValue').textContent=state.volume+'%';});
 document.getElementById('overlaySlider').addEventListener('input',e=>{state.wallpaper.overlay=parseInt(e.target.value);document.getElementById('overlayValue').textContent=state.wallpaper.overlay+'%';applyTheme();});
 
-// TEMA
 document.getElementById('themeGrid').addEventListener('click',e=>{const card=e.target.closest('.theme-card');if(!card)return;state.theme=card.dataset.id;const t=themes.find(th=>th.id===state.theme);state.customColors={bgSolid:t.bgSolid,bgOverlay:t.bgOverlay,primary:t.primary,primaryDark:t.primaryDark,primaryLight:t.primaryLight,accent:t.accent,accent2:t.accent2,accent3:t.accent3};const c=state.customColors;document.getElementById('bgSolidPicker').value=c.bgSolid;document.getElementById('bgSolidText').value=c.bgSolid;document.getElementById('overlayPicker').value=c.bgOverlay;document.getElementById('overlayText').value=c.bgOverlay;document.getElementById('primaryPicker').value=c.primary;document.getElementById('primaryText').value=c.primary;document.getElementById('primaryDarkPicker').value=c.primaryDark;document.getElementById('primaryDarkText').value=c.primaryDark;document.getElementById('primaryLightPicker').value=c.primaryLight;document.getElementById('primaryLightText').value=c.primaryLight;document.getElementById('accentPicker').value=c.accent;document.getElementById('accentText').value=c.accent;document.getElementById('accent3Picker').value=c.accent3;document.getElementById('accent3Text').value=c.accent3;applyTheme();renderThemeGrid();applyYtOverlay();saveState();showToast('Tema: '+t.name,'success');});
-
 function syncColorPicker(pId,tId,key){const p=document.getElementById(pId),t=document.getElementById(tId);p.addEventListener('input',e=>{state.customColors[key]=e.target.value;t.value=e.target.value;applyTheme();applyYtOverlay();});t.addEventListener('input',e=>{if(/^#[0-9A-Fa-f]{6}$/.test(e.target.value)){state.customColors[key]=e.target.value;p.value=e.target.value;applyTheme();applyYtOverlay();}});}
 syncColorPicker('bgSolidPicker','bgSolidText','bgSolid');syncColorPicker('overlayPicker','overlayText','bgOverlay');syncColorPicker('primaryPicker','primaryText','primary');syncColorPicker('primaryDarkPicker','primaryDarkText','primaryDark');syncColorPicker('primaryLightPicker','primaryLightText','primaryLight');syncColorPicker('accentPicker','accentText','accent');syncColorPicker('accent3Picker','accent3Text','accent3');
 document.querySelectorAll('.color-presets').forEach(c=>{c.addEventListener('click',e=>{const p=e.target.closest('.color-preset');if(!p)return;const color=p.dataset.color,key=p.dataset.key;state.customColors[key]=color;const map={'bgSolid':['bgSolidPicker','bgSolidText'],'primary':['primaryPicker','primaryText'],'accent':['accentPicker','accentText']};if(map[key]){document.getElementById(map[key][0]).value=color;document.getElementById(map[key][1]).value=color;}applyTheme();applyYtOverlay();});});
 document.getElementById('saveTheme').addEventListener('click',()=>{saveState();showToast('Tema disimpan','success');});
 document.getElementById('resetTheme').addEventListener('click',()=>{state.theme='islamic-green';const t=themes[0];state.customColors={bgSolid:t.bgSolid,bgOverlay:t.bgOverlay,primary:t.primary,primaryDark:t.primaryDark,primaryLight:t.primaryLight,accent:t.accent,accent2:t.accent2,accent3:t.accent3};state.wallpaper.overlay=82;document.getElementById('overlaySlider').value=82;document.getElementById('overlayValue').textContent='82%';const c=state.customColors;document.getElementById('bgSolidPicker').value=c.bgSolid;document.getElementById('bgSolidText').value=c.bgSolid;document.getElementById('overlayPicker').value=c.bgOverlay;document.getElementById('overlayText').value=c.bgOverlay;document.getElementById('primaryPicker').value=c.primary;document.getElementById('primaryText').value=c.primary;document.getElementById('primaryDarkPicker').value=c.primaryDark;document.getElementById('primaryDarkText').value=c.primaryDark;document.getElementById('primaryLightPicker').value=c.primaryLight;document.getElementById('primaryLightText').value=c.primaryLight;document.getElementById('accentPicker').value=c.accent;document.getElementById('accentText').value=c.accent;document.getElementById('accent3Picker').value=c.accent3;document.getElementById('accent3Text').value=c.accent3;applyTheme();renderThemeGrid();applyYtOverlay();saveState();showToast('Tema direset','success');});
 
-// WALLPAPER
 document.getElementById('slideIntervalSlider').addEventListener('input',e=>{state.slideshow.interval=parseInt(e.target.value);document.getElementById('slideIntervalValue').textContent=state.slideshow.interval+' dtk';startSlideshow();});
 
-// YOUTUBE - FIX
-document.getElementById('applyYoutube').addEventListener('click',()=>{
-  const url=document.getElementById('youtubeUrlInput').value.trim();
-  if(!url){showToast('Masukkan URL YouTube','error');return;}
-  const vid=parseYouTubeUrl(url);
-  if(!vid){showToast('URL YouTube tidak valid. Contoh: https://www.youtube.com/watch?v=...','error');return;}
-  state.youtubeUrl=url;state.bgVideo=null;
-  applyBackground();saveState();
-  showToast('YouTube background aktif! Video akan otomatis mutar.','success');
-});
+document.getElementById('applyYoutube').addEventListener('click',()=>{const url=document.getElementById('youtubeUrlInput').value.trim();if(!url){showToast('Masukkan URL YouTube','error');return;}const vid=parseYouTubeUrl(url);if(!vid){showToast('URL YouTube tidak valid','error');return;}state.youtubeUrl=url;state.bgVideo=null;applyBackground();saveState();showToast('YouTube background aktif!','success');});
 document.getElementById('clearYoutube').addEventListener('click',()=>{state.youtubeUrl='';document.getElementById('youtubeUrlInput').value='';applyBackground();saveState();showToast('YouTube background dihapus','info');});
-
-// YouTube overlay slider
 document.getElementById('ytOverlaySlider').addEventListener('input',e=>{state.ytOverlay=parseInt(e.target.value);document.getElementById('ytOverlayValue').textContent=state.ytOverlay+'%';applyYtOverlay();});
 
-// Custom video
 document.getElementById('bgVideoFile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;if(!f.type.startsWith('video/')){showToast('File harus video','error');return;}if(f.size>20*1024*1024){showToast('Video terlalu besar (max 20MB)','error');return;}const r=new FileReader();r.onload=ev=>{state.bgVideo=ev.target.result;state.youtubeUrl='';document.getElementById('youtubeUrlInput').value='';applyBackground();saveState();document.getElementById('bgVideoName').textContent=f.name;showToast('Video diupload','success');};r.readAsDataURL(f);});
 
 document.getElementById('wallpaperGrid').addEventListener('click',e=>{const item=e.target.closest('.wallpaper-item');if(!item)return;state.wallpaper.type='preset';state.wallpaper.value=item.dataset.id;state.wallpaper.custom=null;state.bgVideo=null;state.youtubeUrl='';document.getElementById('youtubeUrlInput').value='';renderWallpaperGrid();applyBackground();saveState();showToast('Wallpaper diganti','success');});
@@ -641,19 +608,16 @@ document.getElementById('applyWallpaperUrl').addEventListener('click',()=>{const
 document.getElementById('wallpaperFile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;if(f.size>5*1024*1024){showToast('File terlalu besar (max 5MB)','error');return;}const r=new FileReader();r.onload=ev=>{state.wallpaper.type='custom';state.wallpaper.custom=ev.target.result;state.wallpaper.value=null;state.bgVideo=null;state.youtubeUrl='';applyBackground();saveState();showToast('Wallpaper diupload','success');};r.readAsDataURL(f);});
 document.getElementById('resetWallpaper').addEventListener('click',()=>{state.wallpaper.type='preset';state.wallpaper.value='gradient1';state.wallpaper.custom=null;state.bgVideo=null;state.youtubeUrl='';document.getElementById('youtubeUrlInput').value='';renderWallpaperGrid();applyBackground();saveState();showToast('Wallpaper direset','success');});
 
-// BELL
 document.getElementById('bellSlots').addEventListener('click',e=>{const btn=e.target.closest('[data-action]');if(!btn)return;const key=btn.dataset.bellKey,action=btn.dataset.action;if(action==='bell-toggle'){state.bells[key].enabled=!state.bells[key].enabled;renderBellSlots();saveState();}else if(action==='bell-test'){triggerBell(key,state.bells[key]);}else if(action==='bell-clear'){state.bells[key].music=null;state.bells[key].musicName='';renderBellSlots();saveState();showToast('MP3 dihapus','info');}});
 document.getElementById('bellSlots').addEventListener('change',e=>{const input=e.target;if(input.dataset.action==='bell-time'){state.bells[input.dataset.bellKey].time=input.value;saveState();showToast('Waktu diupdate','success');}else if(input.dataset.action==='bell-music'){const key=input.dataset.bellKey,f=input.files[0];if(!f)return;if(f.size>5*1024*1024){showToast('File terlalu besar','error');return;}const r=new FileReader();r.onload=ev=>{state.bells[key].music=ev.target.result;state.bells[key].musicName=f.name;renderBellSlots();saveState();showToast('MP3 disimpan','success');};r.readAsDataURL(f);}});
 document.getElementById('saveBells').addEventListener('click',()=>{saveState();showToast('Bell disimpan','success');});
 
-// ALARM
 document.getElementById('addAlarm').addEventListener('click',()=>{const time=document.getElementById('newAlarmTime').value,label=document.getElementById('newAlarmLabel').value,mf=document.getElementById('alarmMusicFile').files[0];if(!time){showToast('Pilih waktu','error');return;}const a={id:Date.now(),time,label:label||'Alarm',music:null,musicName:'',enabled:true,triggered:false};if(mf){if(mf.size>5*1024*1024){showToast('File terlalu besar','error');return;}const r=new FileReader();r.onload=ev=>{a.music=ev.target.result;a.musicName=mf.name;state.alarms.push(a);updateAlarmList();saveState();document.getElementById('newAlarmTime').value='';document.getElementById('newAlarmLabel').value='';document.getElementById('alarmMusicFile').value='';document.getElementById('alarmMusicName').textContent='Pilih MP3 (atau default)';showToast('Alarm ditambahkan','success');};r.readAsDataURL(mf);}else{state.alarms.push(a);updateAlarmList();saveState();document.getElementById('newAlarmTime').value='';document.getElementById('newAlarmLabel').value='';showToast('Alarm ditambahkan','success');}});
 document.getElementById('alarmMusicFile').addEventListener('change',e=>{const f=e.target.files[0];document.getElementById('alarmMusicName').textContent=f?f.name:'Pilih MP3 (atau default)';});
 document.getElementById('alarmList').addEventListener('click',e=>{const btn=e.target.closest('[data-action]');if(!btn)return;const id=parseInt(btn.dataset.id),action=btn.dataset.action,a=state.alarms.find(al=>al.id===id);if(!a)return;if(action==='toggle'){a.enabled=!a.enabled;updateAlarmList();saveState();}else if(action==='test'){triggerAlarm(a);}else if(action==='delete'){state.alarms=state.alarms.filter(al=>al.id!==id);updateAlarmList();saveState();showToast('Alarm dihapus','success');}});
 document.getElementById('testAlarm').addEventListener('click',()=>triggerAlarm({id:0,time:'now',label:'Tes Alarm',music:null,enabled:true}));
 document.getElementById('stopAlarm').addEventListener('click',stopAlarm);
 
-// SCHEDULE
 document.getElementById('addSchedule').addEventListener('click',()=>{const cls=document.getElementById('newScheduleClass').value,subj=document.getElementById('newScheduleSubject').value,start=document.getElementById('newScheduleStart').value,end=document.getElementById('newScheduleEnd').value,col=document.getElementById('newScheduleColumn').value;if(!cls||!subj||!start||!end){showToast('Lengkapi semua','error');return;}if(start>=end){showToast('Waktu selesai harus lebih besar','error');return;}state.schedules.push({id:Date.now(),class:cls,subject:subj,start,end,column:col});updateScheduleListSettings();saveState();document.getElementById('newScheduleClass').value='';document.getElementById('newScheduleSubject').value='';document.getElementById('newScheduleStart').value='';document.getElementById('newScheduleEnd').value='';showToast('Jadwal ditambahkan','success');});
 document.getElementById('scheduleListSettings').addEventListener('click',e=>{const btn=e.target.closest('[data-action="delete-schedule"]');if(!btn)return;state.schedules=state.schedules.filter(s=>s.id!==parseInt(btn.dataset.id));updateScheduleListSettings();saveState();showToast('Jadwal dihapus','success');});
 document.getElementById('clearSchedule').addEventListener('click',()=>{if(confirm('Hapus semua jadwal?')){state.schedules=[];updateScheduleListSettings();saveState();showToast('Semua jadwal dihapus','success');}});
