@@ -7,312 +7,274 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
-  :root {
-    --bg-overlay: rgba(6, 24, 22, 0.82);
-    --bg-solid: #061512;
-    --primary: #1a8a6f;
-    --primary-dark: #0d5240;
-    --primary-light: #4dd0a8;
-    --accent: #f4c430;
-    --accent-2: #ffd966;
-    --accent-3: #ff8c42;
-    --text: #ffffff;
-    --text-muted: rgba(255, 255, 255, 0.72);
-    --card-bg: rgba(255, 255, 255, 0.05);
-    --card-border: rgba(255, 255, 255, 0.12);
-    --danger: #ff5252;
-    --success: #4caf50;
-    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --primary-rgb: 26, 138, 111;
-    --primary-dark-rgb: 13, 82, 64;
-    --primary-light-rgb: 77, 208, 168;
-    --bg-solid-rgb: 6, 21, 18;
-    --accent-rgb: 244, 196, 48;
-    --accent3-rgb: 255, 140, 66;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { height: 100%; }
-  body { font-family: 'Plus Jakarta Sans', sans-serif; color: var(--text); height: 100vh; height: 100dvh; overflow: hidden; position: relative; background: var(--bg-solid); }
-  #wallpaper-layer { position: fixed; inset: 0; width: 100%; height: 100%; background-size: cover; background-position: center; background-repeat: no-repeat; z-index: 0; }
-  #wallpaper-layer::after { content: ''; position: absolute; inset: 0; background: var(--bg-overlay); }
-  #wallpaper-video { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; display: none; }
-  #wallpaper-video.active { display: block; }
-  #youtube-bg { position: fixed; inset: 0; z-index: 0; display: none; overflow: hidden; }
-  #youtube-bg.active { display: block; }
-  #youtube-bg iframe { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100vw; height: 56.25vw; min-height: 100vh; min-width: 177.78vh; border: 0; z-index: 1; pointer-events: none; }
-  #youtube-overlay { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
-  .pattern-overlay { position: fixed; inset: 0; z-index: 1; pointer-events: none; background-image: radial-gradient(circle at 15% 25%, rgba(var(--primary-rgb), 0.18) 0%, transparent 40%), radial-gradient(circle at 85% 75%, rgba(var(--accent-rgb), 0.12) 0%, transparent 40%); }
-  .particles { position: fixed; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
-  .particle { position: absolute; background: rgba(var(--accent-rgb), 0.35); border-radius: 50%; animation: float linear infinite; }
-  @keyframes float { 0% { transform: translateY(100vh); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(-10vh); opacity: 0; } }
-  #audio-unlock { position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; flex-direction: column; text-align: center; padding: 20px; }
-  #audio-unlock.show { display: flex; }
-  #audio-unlock i { font-size: 3rem; color: var(--accent); margin-bottom: 20px; animation: pulse 1.5s ease-in-out infinite; }
-  #audio-unlock h2 { font-size: 1.5rem; margin-bottom: 10px; }
-  #audio-unlock p { color: var(--text-muted); margin-bottom: 24px; font-size: 0.9rem; line-height: 1.5; }
-  #audio-unlock button { padding: 16px 40px; background: linear-gradient(135deg, var(--accent), #e6a820); color: #1a1a1a; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; font-family: inherit; box-shadow: 0 8px 24px rgba(244,196,48,0.4); }
-
-  /* ===== PANGGIL SISWA BUTTON ===== */
-  .call-btn { position: fixed; bottom: 80px; right: 24px; z-index: 50; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent-3)); color: #1a1a1a; border: none; cursor: pointer; font-size: 1.4rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(244,196,48,0.5); transition: var(--transition); animation: callPulse 2s ease-in-out infinite; }
-  .call-btn:hover { transform: scale(1.1); }
-  @keyframes callPulse { 0%, 100% { box-shadow: 0 6px 20px rgba(244,196,48,0.5); } 50% { box-shadow: 0 6px 40px rgba(244,196,48,0.8); } }
-
-  /* ===== PANGGIL SISWA MODAL (input) ===== */
-  .call-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 300; display: none; align-items: center; justify-content: center; padding: 20px; }
-  .call-modal.show { display: flex; }
-  .call-modal-content { background: linear-gradient(135deg, #0a1f1a, #1a2e28); border: 2px solid var(--accent); border-radius: 24px; padding: 28px; max-width: 500px; width: 100%; box-shadow: 0 20px 80px rgba(0,0,0,0.6); }
-  .call-modal-content h2 { font-size: 1.3rem; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; color: var(--accent); }
-  .call-names-list { max-height: 200px; overflow-y: auto; margin-bottom: 16px; display: flex; flex-direction: column; gap: 8px; }
-  .call-name-row { display: flex; gap: 8px; align-items: center; }
-  .call-name-row input { flex: 1; }
-  .call-name-row .remove-row { width: 38px; height: 38px; border-radius: 8px; background: rgba(255,82,82,0.15); border: 1px solid rgba(255,82,82,0.3); color: var(--danger); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; flex-shrink: 0; }
-  .call-name-row .remove-row:hover { background: var(--danger); color: white; }
-  .call-add-btn { width: 100%; padding: 10px; background: rgba(255,255,255,0.06); border: 1px dashed var(--card-border); border-radius: 10px; color: var(--text-muted); cursor: pointer; font-size: 0.85rem; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 16px; }
-  .call-add-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .call-actions { display: flex; gap: 10px; }
-  .call-actions .btn { flex: 1; }
-
-  /* ===== PANGGIL SISWA DISPLAY (overlay) ===== */
-  .call-display { position: fixed; inset: 0; z-index: 250; display: none; align-items: center; justify-content: center; flex-direction: column; background: rgba(0,0,0,0.92); backdrop-filter: blur(10px); }
-  .call-display.show { display: flex; animation: callFadeIn 0.5s ease; }
-  @keyframes callFadeIn { from { opacity: 0; } to { opacity: 1; } }
-  .call-display::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,0,0,0.2), rgba(255,200,0,0.2)); animation: callBgPulse 1s ease-in-out infinite; }
-  @keyframes callBgPulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.7; } }
-  .call-display-border { position: absolute; inset: 0; border: 10px solid var(--accent); pointer-events: none; animation: callBorderFlash 0.6s ease-in-out infinite; }
-  @keyframes callBorderFlash { 0%, 100% { border-color: #ff0000; box-shadow: inset 0 0 100px rgba(255,0,0,0.4); } 50% { border-color: #ffff00; box-shadow: inset 0 0 150px rgba(255,200,0,0.5); } }
-  .call-display-content { position: relative; z-index: 1; text-align: center; padding: 40px; max-width: 900px; width: 100%; }
-  .call-display-icon { font-size: 4rem; color: var(--accent); margin-bottom: 20px; animation: callIconBounce 1s ease-in-out infinite; }
-  @keyframes callIconBounce { 0%, 100% { transform: scale(1) rotate(0); } 25% { transform: scale(1.2) rotate(-10deg); } 75% { transform: scale(1.2) rotate(10deg); } }
-  .call-display-label { font-size: 1.2rem; color: var(--accent); text-transform: uppercase; letter-spacing: 4px; margin-bottom: 16px; font-weight: 700; }
-  .call-display-names { font-size: 2.5rem; font-weight: 900; color: #fff; line-height: 1.3; margin-bottom: 20px; text-shadow: 0 4px 20px rgba(0,0,0,0.8); }
-  .call-display-names .name-item { display: inline-block; padding: 4px 16px; margin: 4px; background: rgba(255,255,255,0.1); border-radius: 12px; border: 2px solid var(--accent); animation: callNameIn 0.5s ease; }
-  @keyframes callNameIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-  .call-display-message { font-size: 1.2rem; color: var(--accent-2); margin-bottom: 24px; font-weight: 600; }
-  .call-display-countdown { font-family: 'Orbitron', sans-serif; font-size: 1rem; color: var(--text-muted); margin-bottom: 20px; }
-  .call-display-close { padding: 14px 32px; background: linear-gradient(135deg, var(--danger), #c82333); color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; font-family: inherit; }
-  .call-display-close:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255,0,0,0.4); }
-
-  .bell-flash-overlay { position: fixed; inset: 0; z-index: 99; pointer-events: none; display: none; }
-  body.bell-active .bell-flash-overlay { display: block; background: rgba(255, 0, 0, 0.15); animation: bellFlash 0.6s ease-in-out infinite; }
-  @keyframes bellFlash { 0%, 100% { opacity: 0.2; } 50% { opacity: 0.6; } }
-  .bell-border { position: fixed; inset: 0; z-index: 99; pointer-events: none; display: none; border: 8px solid var(--danger); }
-  body.bell-active .bell-border { display: block; animation: borderFlash 0.5s ease-in-out infinite; }
-  @keyframes borderFlash { 0%, 100% { border-color: #ff0000; box-shadow: inset 0 0 80px rgba(255, 0, 0, 0.5), 0 0 40px rgba(255, 0, 0, 0.4); } 50% { border-color: #ffff00; box-shadow: inset 0 0 120px rgba(255, 200, 0, 0.7), 0 0 80px rgba(255, 200, 0, 0.6); } }
-  body.bell-active .display-header { animation: headerFlash 0.5s ease-in-out infinite; }
-  @keyframes headerFlash { 0%, 100% { background: linear-gradient(135deg, rgba(var(--primary-dark-rgb), 0.95), rgba(var(--bg-solid-rgb), 0.95)); } 50% { background: linear-gradient(135deg, rgba(255, 0, 0, 0.7), rgba(120, 0, 0, 0.85)); } }
-  body.bell-active .clock-widget, body.bell-active .activity-progress-mini, body.bell-active .schedule-card.active { animation: cardFlash 0.5s ease-in-out infinite; }
-  @keyframes cardFlash { 0%, 100% { box-shadow: 0 4px 20px rgba(255, 0, 0, 0.4); border-color: rgba(255, 0, 0, 0.6); } 50% { box-shadow: 0 4px 40px rgba(255, 200, 0, 0.6); border-color: rgba(255, 200, 0, 0.8); } }
-  body.bell-active .clock-time { animation: textFlash 0.5s ease-in-out infinite; }
-  @keyframes textFlash { 0%, 100% { background: linear-gradient(135deg, #ff0000, #ff8c42); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.8)); } 50% { background: linear-gradient(135deg, #ffff00, #ffffff); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 20px rgba(255, 255, 0, 0.9)); } }
-  body.bell-active .clock-seconds { animation: secondsFlash 0.5s ease-in-out infinite; }
-  @keyframes secondsFlash { 0%, 100% { color: #ff0000; } 50% { color: #ffff00; } }
-  .display-container { position: relative; z-index: 10; width: 100vw; height: 100vh; height: 100dvh; display: grid; grid-template-rows: auto 1fr auto; gap: 0; }
-  .display-header { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 14px 28px; background: linear-gradient(135deg, rgba(var(--primary-dark-rgb), 0.95), rgba(var(--bg-solid-rgb), 0.95)); border-bottom: 3px solid var(--accent); box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4); }
-  .header-left { display: flex; align-items: center; gap: 14px; }
-  .school-logo { width: 56px; height: 56px; border-radius: 12px; background: linear-gradient(135deg, var(--accent), var(--accent-3)); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #1a1a1a; font-weight: 900; box-shadow: 0 6px 20px rgba(var(--accent-rgb), 0.4); flex-shrink: 0; }
-  .school-info h1 { font-size: 1.4rem; font-weight: 800; line-height: 1.1; letter-spacing: -0.3px; background: linear-gradient(90deg, #fff, var(--accent-2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-  .school-info .subtitle { font-size: 0.78rem; color: var(--text-muted); margin-top: 3px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-  .school-info .subtitle span { display: flex; align-items: center; gap: 4px; }
-  .school-info .subtitle i { color: var(--primary-light); font-size: 0.7rem; }
-  .header-center { text-align: center; padding: 0 20px; }
-  .header-center .arabic { font-family: 'Amiri', serif; font-size: 1.2rem; color: var(--accent); margin-bottom: 2px; }
-  .header-center .motto { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; }
-  .header-right { display: flex; align-items: center; justify-content: flex-end; gap: 16px; }
-  .datetime-box { text-align: right; background: rgba(0, 0, 0, 0.3); padding: 8px 16px; border-radius: 10px; border: 1px solid rgba(var(--accent-rgb), 0.2); }
-  .datetime-box .day-date { font-size: 0.95rem; color: var(--accent); font-weight: 700; text-transform: capitalize; }
-  .datetime-box .time { font-family: 'Orbitron', sans-serif; font-size: 1.3rem; font-weight: 700; color: #fff; margin-top: 2px; letter-spacing: 1px; }
-  .settings-btn { width: 44px; height: 44px; border-radius: 10px; border: 1px solid var(--accent); background: rgba(var(--accent-rgb), 0.12); color: var(--accent); font-size: 1rem; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .settings-btn:hover { background: var(--accent); color: #1a1a1a; transform: rotate(45deg); }
-  .main-content { display: grid; grid-template-columns: 1fr 1.3fr 1fr; gap: 16px; padding: 16px 20px; overflow: hidden; }
-  .schedule-column { display: flex; flex-direction: column; gap: 10px; overflow: hidden; }
-  .column-title { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); padding: 10px 16px; border-radius: 10px; text-align: center; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1.5px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); border: 1px solid rgba(var(--accent-rgb), 0.3); display: flex; align-items: center; justify-content: center; gap: 10px; flex-shrink: 0; }
-  .column-title i { color: var(--accent); }
-  .schedule-list { flex: 1; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; padding-right: 4px; }
-  .schedule-card { background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)); border: 1px solid var(--card-border); border-radius: 12px; padding: 12px 14px; transition: var(--transition); position: relative; overflow: hidden; flex-shrink: 0; }
-  .schedule-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--primary-light); }
-  .schedule-card.active { background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.18), rgba(var(--accent-rgb), 0.05)); border-color: var(--accent); box-shadow: 0 4px 20px rgba(var(--accent-rgb), 0.2); transform: scale(1.02); }
-  .schedule-card.active::before { background: var(--accent); width: 5px; }
-  .schedule-card.next::before { background: var(--accent-3); }
-  .schedule-card .class-name { font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-  .schedule-card .class-name .badge { font-size: 0.6rem; padding: 2px 8px; background: var(--accent); color: #1a1a1a; border-radius: 50px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
-  .schedule-card.next .class-name .badge { background: var(--accent-3); }
-  .schedule-card .class-time { font-family: 'Orbitron', sans-serif; font-size: 0.85rem; color: var(--accent-2); margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
-  .schedule-card .class-subject { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
-  .schedule-card .class-subject i { color: var(--primary-light); margin-right: 4px; }
-  .center-column { display: flex; flex-direction: column; gap: 12px; overflow: hidden; }
-  .building-image { flex: 1; border-radius: 16px; overflow: hidden; position: relative; background: linear-gradient(135deg, var(--primary-dark), var(--bg-solid)); border: 1px solid var(--card-border); box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4); min-height: 200px; }
-  .building-image .slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1.5s ease; background-size: cover; background-position: center; }
-  .building-image .slide.active { opacity: 1; }
-  .building-image .slide-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1.5s ease; }
-  .building-image .slide-video.active { opacity: 1; }
-  .building-image .slide-yt { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; opacity: 0; transition: opacity 1.5s ease; }
-  .building-image .slide-yt.active { opacity: 1; }
-  .building-image::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 50%, rgba(var(--bg-solid-rgb), 0.9)); pointer-events: none; z-index: 2; }
-  .slide-indicators { position: absolute; top: 12px; right: 12px; display: flex; gap: 6px; z-index: 3; }
-  .slide-indicator { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.4); transition: var(--transition); }
-  .slide-indicator.active { background: var(--accent); width: 24px; border-radius: 10px; }
-  .building-caption { position: absolute; bottom: 0; left: 0; right: 0; padding: 16px 20px; z-index: 3; }
-  .building-caption h2 { font-size: 1.3rem; font-weight: 800; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
-  .building-caption p { font-size: 0.8rem; color: var(--accent-2); margin-top: 4px; text-shadow: 0 2px 8px rgba(0,0,0,0.8); }
-  .clock-widget { background: linear-gradient(135deg, rgba(var(--primary-dark-rgb), 0.6), rgba(var(--bg-solid-rgb), 0.6)); border: 1px solid var(--card-border); border-radius: 14px; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; backdrop-filter: blur(10px); flex-shrink: 0; }
-  .clock-widget .clock-time { font-family: 'Orbitron', sans-serif; font-size: 2rem; font-weight: 900; background: linear-gradient(135deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; }
-  .clock-widget .clock-seconds { font-family: 'Orbitron', sans-serif; font-size: 1.1rem; color: var(--accent-3); }
-  .clock-widget .clock-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; margin-top: 4px; }
-  .clock-widget .clock-icon { font-size: 1.8rem; color: var(--accent); animation: pulse 2s ease-in-out infinite; }
-  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.95); } }
-  .activity-progress-mini { background: rgba(255, 255, 255, 0.05); border-radius: 10px; padding: 10px 14px; border: 1px solid var(--card-border); flex-shrink: 0; }
-  .activity-progress-mini .label { font-size: 0.7rem; color: var(--accent); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; display: flex; justify-content: space-between; gap: 8px; }
-  .progress-bar-mini { height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 10px; overflow: hidden; position: relative; }
-  .progress-bar-mini-fill { height: 100%; background: linear-gradient(90deg, var(--primary-light), var(--accent)); border-radius: 10px; transition: width 1s linear; position: relative; }
-  .progress-bar-mini-fill::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent); animation: shimmer 2s linear infinite; }
-  @keyframes shimmer { to { transform: translateX(100%); } }
-  .display-footer { background: linear-gradient(135deg, rgba(var(--primary-dark-rgb), 0.95), rgba(var(--bg-solid-rgb), 0.95)); border-top: 3px solid var(--accent); padding: 10px 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .footer-section { display: flex; align-items: center; gap: 12px; padding: 6px 14px; background: rgba(0, 0, 0, 0.3); border-radius: 10px; overflow: hidden; }
-  .footer-section .footer-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--accent); color: #1a1a1a; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; flex-shrink: 0; }
-  .footer-section .footer-icon.red { background: var(--accent-3); }
-  .footer-section .footer-text { flex: 1; overflow: hidden; white-space: nowrap; position: relative; }
-  .footer-section .footer-text .ticker-text { display: inline-block; animation: scrollText 25s linear infinite; font-size: 0.85rem; color: var(--text); }
-  .footer-section .footer-text .ticker-text strong { color: var(--accent); margin-right: 8px; }
-  @keyframes scrollText { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-  .settings-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
-  .settings-overlay.active { opacity: 1; pointer-events: auto; }
-  .settings-panel { position: fixed; top: 0; right: 0; width: 500px; max-width: 100vw; height: 100vh; height: 100dvh; background: linear-gradient(135deg, #0a1f1a, #1a2e28); border-left: 1px solid var(--accent); box-shadow: -20px 0 60px rgba(0, 0, 0, 0.6); z-index: 101; transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; overflow: hidden; }
-  .settings-panel.active { transform: translateX(0); }
-  .settings-header { padding: 20px 24px; background: linear-gradient(135deg, var(--primary-dark), var(--primary)); display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--accent); flex-shrink: 0; }
-  .settings-header h2 { font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
-  .settings-header h2 i { color: var(--accent); }
-  .close-btn { width: 38px; height: 38px; border-radius: 10px; border: 1px solid var(--card-border); background: rgba(0, 0, 0, 0.3); color: var(--text); cursor: pointer; transition: var(--transition); font-size: 0.95rem; }
-  .close-btn:hover { background: var(--danger); border-color: var(--danger); }
-  .settings-tabs { display: flex; padding: 0 16px; gap: 2px; border-bottom: 1px solid var(--card-border); background: rgba(0, 0, 0, 0.2); overflow-x: auto; flex-shrink: 0; }
-  .tab-btn { padding: 12px 12px; background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.82rem; font-weight: 500; transition: var(--transition); border-bottom: 2px solid transparent; display: flex; align-items: center; gap: 6px; white-space: nowrap; font-family: inherit; }
-  .tab-btn:hover { color: var(--text); }
-  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
-  .settings-body { flex: 1; overflow-y: auto; padding: 20px 24px; -webkit-overflow-scrolling: touch; }
-  .settings-section { display: none; animation: fadeIn 0.4s ease; }
-  .settings-section.active { display: block; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  .form-group { margin-bottom: 18px; }
-  .form-group label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; font-weight: 500; }
-  .form-control { width: 100%; padding: 11px 14px; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--card-border); border-radius: 10px; color: var(--text); font-size: 16px; font-family: inherit; transition: var(--transition); }
-  .form-control:focus { outline: none; border-color: var(--accent); background: rgba(255, 255, 255, 0.08); }
-  textarea.form-control { resize: vertical; min-height: 70px; font-family: inherit; }
-  .color-input-group { display: flex; align-items: center; gap: 10px; }
-  .color-input-group input[type="color"] { width: 50px; height: 40px; border: 1px solid var(--card-border); border-radius: 10px; background: transparent; cursor: pointer; padding: 2px; }
-  .color-input-group input[type="color"]::-webkit-color-swatch { border-radius: 8px; border: none; }
-  .color-input-group .color-text { flex: 1; padding: 10px 14px; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--card-border); border-radius: 10px; color: var(--text); font-family: 'Orbitron', sans-serif; font-size: 0.85rem; }
-  .color-presets { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
-  .color-preset { width: 28px; height: 28px; border-radius: 8px; cursor: pointer; border: 2px solid transparent; transition: var(--transition); }
-  .color-preset:hover { transform: scale(1.1); border-color: rgba(255,255,255,0.3); }
-  .color-preview-box { margin-top: 12px; padding: 16px; border-radius: 12px; border: 1px solid var(--card-border); background: linear-gradient(135deg, var(--primary-dark), var(--primary)); text-align: center; font-weight: 700; color: #fff; font-size: 0.9rem; }
-  .btn { padding: 11px 18px; border: none; border-radius: 10px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: var(--transition); display: inline-flex; align-items: center; gap: 8px; font-family: inherit; }
-  .btn-primary { background: linear-gradient(135deg, var(--accent), #e6a820); color: #1a1a1a; }
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(var(--accent-rgb), 0.4); }
-  .btn-secondary { background: rgba(255, 255, 255, 0.06); color: var(--text); border: 1px solid var(--card-border); }
-  .btn-secondary:hover { background: rgba(255, 255, 255, 0.1); }
-  .btn-danger { background: rgba(255, 82, 82, 0.15); color: var(--danger); border: 1px solid rgba(255, 82, 82, 0.3); }
-  .btn-danger:hover { background: var(--danger); color: white; }
-  .btn-block { width: 100%; justify-content: center; }
-  .theme-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .theme-card { border-radius: 12px; padding: 14px; cursor: pointer; border: 2px solid transparent; transition: var(--transition); position: relative; overflow: hidden; background: rgba(255, 255, 255, 0.04); }
-  .theme-card .theme-colors { display: flex; gap: 4px; margin-bottom: 8px; }
-  .theme-card .theme-color { width: 24px; height: 24px; border-radius: 6px; }
-  .theme-card .theme-name { font-size: 0.85rem; font-weight: 600; color: var(--text); }
-  .theme-card.active { border-color: var(--accent); background: rgba(255, 255, 255, 0.08); }
-  .theme-card.active::after { content: '✓'; position: absolute; top: 6px; right: 8px; color: var(--accent); font-weight: 900; font-size: 1rem; }
-  .slideshow-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 12px; }
-  .slide-slot { aspect-ratio: 16/10; border-radius: 10px; border: 2px dashed var(--card-border); background: rgba(255, 255, 255, 0.03); cursor: pointer; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
-  .slide-slot:hover { border-color: var(--accent); }
-  .slide-slot img, .slide-slot video { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
-  .slide-slot .slot-content { text-align: center; z-index: 1; }
-  .slide-slot .slot-content i { font-size: 1.2rem; color: var(--accent); margin-bottom: 4px; }
-  .slide-slot .slot-content p { font-size: 0.7rem; color: var(--text-muted); }
-  .slide-slot .remove-btn { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; background: rgba(255, 82, 82, 0.9); color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 0.65rem; z-index: 2; display: flex; align-items: center; justify-content: center; }
-  .slide-slot .media-badge { position: absolute; bottom: 4px; left: 4px; padding: 2px 8px; background: rgba(0, 0, 0, 0.7); border-radius: 50px; font-size: 0.6rem; color: var(--accent); z-index: 2; display: flex; align-items: center; gap: 3px; }
-  .slide-slot .yt-preview { width: 100%; height: 100%; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #000; }
-  .slide-slot .yt-preview i { font-size: 2rem; color: #ff0000; }
-  .bell-slot { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
-  .bell-slot .bell-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-  .bell-slot .bell-name { font-size: 0.95rem; font-weight: 700; color: var(--accent); display: flex; align-items: center; gap: 8px; }
-  .bell-slot .bell-name i { font-size: 0.9rem; }
-  .bell-slot .bell-content { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; align-items: center; }
-  .bell-slot input[type="time"] { padding: 8px 12px; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--card-border); border-radius: 8px; color: var(--text); font-family: 'Orbitron', sans-serif; font-size: 0.95rem; width: 100%; }
-  .bell-slot .bell-actions { display: flex; gap: 6px; align-items: center; margin-top: 8px; }
-  .bell-slot .file-name { font-size: 0.7rem; color: var(--text-muted); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .bell-file-upload { position: relative; }
-  .bell-file-upload input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-  .bell-file-btn { padding: 6px 10px; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--card-border); border-radius: 6px; color: var(--text); font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 4px; width: 100%; justify-content: center; }
-  .wallpaper-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-  .wallpaper-item { aspect-ratio: 16/10; border-radius: 10px; overflow: hidden; cursor: pointer; border: 2px solid transparent; position: relative; transition: var(--transition); }
-  .wallpaper-item img, .wallpaper-item .gradient-preview { width: 100%; height: 100%; object-fit: cover; }
-  .wallpaper-item:hover { transform: scale(1.05); }
-  .wallpaper-item.active { border-color: var(--accent); }
-  .wallpaper-item .check { position: absolute; top: 5px; right: 5px; width: 22px; height: 22px; background: var(--accent); border-radius: 50%; display: none; align-items: center; justify-content: center; color: #1a1a1a; font-size: 0.7rem; }
-  .wallpaper-item.active .check { display: flex; }
-  .alarm-list, .schedule-list-settings { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
-  .alarm-item { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); border-radius: 12px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; transition: var(--transition); }
-  .alarm-item:hover { background: rgba(255, 255, 255, 0.08); }
-  .alarm-info { flex: 1; min-width: 0; }
-  .alarm-time { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; font-weight: 700; color: var(--accent); }
-  .alarm-details { font-size: 0.75rem; color: var(--text-muted); margin-top: 3px; word-break: break-word; }
-  .alarm-actions { display: flex; gap: 6px; flex-shrink: 0; }
-  .icon-btn { width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--card-border); background: var(--card-bg); color: var(--text); cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
-  .icon-btn:hover { background: rgba(255, 255, 255, 0.1); }
-  .toggle-switch { position: relative; width: 44px; height: 24px; background: rgba(255, 255, 255, 0.1); border-radius: 50px; cursor: pointer; transition: var(--transition); flex-shrink: 0; }
-  .toggle-switch.active { background: var(--success); }
-  .toggle-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; background: white; border-radius: 50%; transition: var(--transition); }
-  .toggle-switch.active::after { transform: translateX(20px); }
-  .file-upload { position: relative; display: block; }
-  .file-upload input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-  .upload-area { border: 2px dashed var(--card-border); border-radius: 12px; padding: 18px; text-align: center; cursor: pointer; transition: var(--transition); background: rgba(255, 255, 255, 0.03); }
-  .upload-area:hover { border-color: var(--accent); }
-  .upload-area i { font-size: 1.3rem; color: var(--accent); margin-bottom: 6px; }
-  .upload-area p { font-size: 0.8rem; color: var(--text-muted); }
-  .slider-container { display: flex; align-items: center; gap: 12px; }
-  .slider { flex: 1; -webkit-appearance: none; appearance: none; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 10px; outline: none; }
-  .slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; background: var(--accent); border-radius: 50%; cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); }
-  .slider::-moz-range-thumb { width: 20px; height: 20px; background: var(--accent); border-radius: 50%; cursor: pointer; border: none; }
-  .slider-value { font-family: 'Orbitron', sans-serif; font-size: 0.85rem; color: var(--accent); min-width: 50px; text-align: right; }
-  .toast { position: fixed; top: 24px; left: 50%; transform: translateX(-50%) translateY(-100px); background: linear-gradient(135deg, #0a1f1a, #1a2e28); border: 1px solid var(--accent); color: var(--text); padding: 12px 22px; border-radius: 12px; z-index: 200; transition: transform 0.3s ease; display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); font-size: 0.85rem; max-width: 90vw; }
-  .toast.show { transform: translateX(-50%) translateY(0); }
-  .toast.success i { color: var(--success); }
-  .toast.error i { color: var(--danger); }
-  .toast.info i { color: var(--accent); }
-  .alarm-modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px); z-index: 150; display: none; align-items: center; justify-content: center; padding: 20px; }
-  .alarm-modal.show { display: flex; }
-  .alarm-modal-content { background: linear-gradient(135deg, #0a1f1a, #1a2e28); border: 2px solid var(--danger); border-radius: 24px; padding: 36px; text-align: center; max-width: 400px; width: 100%; box-shadow: 0 20px 80px rgba(255, 0, 0, 0.6); }
-  .alarm-icon { width: 80px; height: 80px; margin: 0 auto 18px; border-radius: 50%; background: linear-gradient(135deg, var(--danger), var(--accent-3)); display: flex; align-items: center; justify-content: center; font-size: 2.2rem; color: #fff; animation: ring 0.5s ease-in-out infinite; box-shadow: 0 0 40px rgba(255, 0, 0, 0.6); }
-  @keyframes ring { 0%, 100% { transform: rotate(0) scale(1); } 25% { transform: rotate(-15deg) scale(1.1); } 75% { transform: rotate(15deg) scale(1.1); } }
-  .alarm-modal h2 { font-size: 1.6rem; margin-bottom: 6px; color: #fff; }
-  .alarm-modal p { color: var(--text-muted); margin-bottom: 22px; }
-  ::-webkit-scrollbar { width: 5px; }
-  ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); }
-  ::-webkit-scrollbar-thumb { background: rgba(var(--accent-rgb), 0.3); border-radius: 10px; }
-  ::-webkit-scrollbar-thumb:hover { background: rgba(var(--accent-rgb), 0.5); }
-  @media (max-width: 1100px) { .main-content { grid-template-columns: 1fr 1.2fr; } .schedule-column:nth-child(3) { display: none; } }
-  @media (max-width: 768px) { .display-header { grid-template-columns: 1fr auto; padding: 10px 16px; } .header-center { display: none; } .main-content { grid-template-columns: 1fr; grid-template-rows: auto 1fr; padding: 10px; } .center-column { order: -1; } .schedule-column:nth-child(3) { display: none; } .display-footer { grid-template-columns: 1fr; } .school-info h1 { font-size: 1rem; } .school-info .subtitle { font-size: 0.65rem; } .datetime-box .time { font-size: 1.1rem; } .datetime-box .day-date { font-size: 0.8rem; } .clock-widget .clock-time { font-size: 1.5rem; } .clock-widget { padding: 10px 14px; } .settings-panel { width: 100vw; } .settings-body { padding: 16px; } .form-control { font-size: 16px; } .call-display-names { font-size: 1.5rem; } .call-btn { bottom: 70px; right: 16px; } }
+:root{--bg-overlay:rgba(6,24,22,0.82);--bg-solid:#061512;--primary:#1a8a6f;--primary-dark:#0d5240;--primary-light:#4dd0a8;--accent:#f4c430;--accent-2:#ffd966;--accent-3:#ff8c42;--text:#fff;--text-muted:rgba(255,255,255,0.72);--card-bg:rgba(255,255,255,0.05);--card-border:rgba(255,255,255,0.12);--danger:#ff5252;--success:#4caf50;--transition:all 0.3s cubic-bezier(0.4,0,0.2,1);--primary-rgb:26,138,111;--primary-dark-rgb:13,82,64;--primary-light-rgb:77,208,168;--bg-solid-rgb:6,21,18;--accent-rgb:244,196,48;--accent3-rgb:255,140,66}
+*{margin:0;padding:0;box-sizing:border-box}
+html{height:100%}
+body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--text);height:100vh;height:100dvh;overflow:hidden;position:relative;background:var(--bg-solid)}
+#wallpaper-layer{position:fixed;inset:0;width:100%;height:100%;background-size:cover;background-position:center;background-repeat:no-repeat;z-index:0}
+#wallpaper-layer::after{content:'';position:absolute;inset:0;background:var(--bg-overlay)}
+#wallpaper-video{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;display:none}
+#wallpaper-video.active{display:block}
+#youtube-bg{position:fixed;inset:0;z-index:0;display:none;overflow:hidden}
+#youtube-bg.active{display:block}
+#youtube-bg iframe{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:100vw;height:56.25vw;min-height:100vh;min-width:177.78vh;border:0;z-index:1;pointer-events:none}
+#youtube-overlay{position:absolute;inset:0;z-index:2;pointer-events:none}
+.pattern-overlay{position:fixed;inset:0;z-index:1;pointer-events:none;background-image:radial-gradient(circle at 15% 25%,rgba(var(--primary-rgb),0.18) 0%,transparent 40%),radial-gradient(circle at 85% 75%,rgba(var(--accent-rgb),0.12) 0%,transparent 40%)}
+.pattern-overlay::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,transparent,transparent 60px,rgba(255,255,255,0.02) 60px,rgba(255,255,255,0.02) 61px),repeating-linear-gradient(-45deg,transparent,transparent 60px,rgba(255,255,255,0.02) 60px,rgba(255,255,255,0.02) 61px)}
+.particles{position:fixed;inset:0;z-index:2;pointer-events:none;overflow:hidden}
+.particle{position:absolute;background:rgba(var(--accent-rgb),0.35);border-radius:50%;animation:float linear infinite}
+@keyframes float{0%{transform:translateY(100vh);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-10vh);opacity:0}}
+#audio-unlock{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.95);display:none;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:20px}
+#audio-unlock.show{display:flex}
+#audio-unlock i{font-size:3rem;color:var(--accent);margin-bottom:20px;animation:pulse 1.5s ease-in-out infinite}
+#audio-unlock h2{font-size:1.5rem;margin-bottom:10px}
+#audio-unlock p{color:var(--text-muted);margin-bottom:24px;font-size:0.9rem;line-height:1.5}
+#audio-unlock button{padding:16px 40px;background:linear-gradient(135deg,var(--accent),#e6a820);color:#1a1a1a;border:none;border-radius:12px;font-size:1.1rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 8px 24px rgba(244,196,48,0.4)}
+.call-btn{position:fixed;bottom:80px;right:24px;z-index:50;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-3));color:#1a1a1a;border:none;cursor:pointer;font-size:1.4rem;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(244,196,48,0.5);transition:var(--transition);animation:callPulse 2s ease-in-out infinite}
+.call-btn:hover{transform:scale(1.1)}
+@keyframes callPulse{0%,100%{box-shadow:0 6px 20px rgba(244,196,48,0.5)}50%{box-shadow:0 6px 40px rgba(244,196,48,0.8)}}
+.call-modal{position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(10px);z-index:300;display:none;align-items:center;justify-content:center;padding:20px}
+.call-modal.show{display:flex}
+.call-modal-content{background:linear-gradient(135deg,#0a1f1a,#1a2e28);border:2px solid var(--accent);border-radius:24px;padding:28px;max-width:500px;width:100%;box-shadow:0 20px 80px rgba(0,0,0,0.6);max-height:90vh;overflow-y:auto}
+.call-modal-content h2{font-size:1.3rem;margin-bottom:20px;display:flex;align-items:center;gap:10px;color:var(--accent)}
+.call-names-list{max-height:200px;overflow-y:auto;margin-bottom:16px;display:flex;flex-direction:column;gap:8px}
+.call-name-row{display:flex;gap:8px;align-items:center}
+.call-name-row input{flex:1}
+.call-name-row .remove-row{width:38px;height:38px;border-radius:8px;background:rgba(255,82,82,0.15);border:1px solid rgba(255,82,82,0.3);color:var(--danger);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.85rem;flex-shrink:0}
+.call-name-row .remove-row:hover{background:var(--danger);color:#fff}
+.call-add-btn{width:100%;padding:10px;background:rgba(255,255,255,0.06);border:1px dashed var(--card-border);border-radius:10px;color:var(--text-muted);cursor:pointer;font-size:0.85rem;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:16px}
+.call-add-btn:hover{border-color:var(--accent);color:var(--accent)}
+.call-actions{display:flex;gap:10px}
+.call-actions .btn{flex:1}
+.call-display{position:fixed;inset:0;z-index:250;display:none;align-items:center;justify-content:center;flex-direction:column;background:rgba(0,0,0,0.92);backdrop-filter:blur(10px)}
+.call-display.show{display:flex;animation:callFadeIn 0.5s ease}
+@keyframes callFadeIn{from{opacity:0}to{opacity:1}}
+.call-display::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,0,0,0.2),rgba(255,200,0,0.2));animation:callBgPulse 1s ease-in-out infinite}
+@keyframes callBgPulse{0%,100%{opacity:0.3}50%{opacity:0.7}}
+.call-display-border{position:absolute;inset:0;border:10px solid var(--accent);pointer-events:none;animation:callBorderFlash 0.6s ease-in-out infinite}
+@keyframes callBorderFlash{0%,100%{border-color:#ff0000;box-shadow:inset 0 0 100px rgba(255,0,0,0.4)}50%{border-color:#ffff00;box-shadow:inset 0 0 150px rgba(255,200,0,0.5)}}
+.call-display-content{position:relative;z-index:1;text-align:center;padding:40px;max-width:900px;width:100%}
+.call-display-icon{font-size:4rem;color:var(--accent);margin-bottom:20px;animation:callIconBounce 1s ease-in-out infinite}
+@keyframes callIconBounce{0%,100%{transform:scale(1) rotate(0)}25%{transform:scale(1.2) rotate(-10deg)}75%{transform:scale(1.2) rotate(10deg)}}
+.call-display-label{font-size:1.2rem;color:var(--accent);text-transform:uppercase;letter-spacing:4px;margin-bottom:16px;font-weight:700}
+.call-display-names{font-size:2.5rem;font-weight:900;color:#fff;line-height:1.3;margin-bottom:20px;text-shadow:0 4px 20px rgba(0,0,0,0.8)}
+.call-display-names .name-item{display:inline-block;padding:4px 16px;margin:4px;background:rgba(255,255,255,0.1);border-radius:12px;border:2px solid var(--accent);animation:callNameIn 0.5s ease}
+@keyframes callNameIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.call-display-message{font-size:1.2rem;color:var(--accent-2);margin-bottom:24px;font-weight:600}
+.call-display-countdown{font-family:'Orbitron',sans-serif;font-size:1rem;color:var(--text-muted);margin-bottom:20px}
+.call-display-close{padding:14px 32px;background:linear-gradient(135deg,var(--danger),#c82333);color:#fff;border:none;border-radius:12px;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit}
+.call-display-close:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(255,0,0,0.4)}
+.bell-flash-overlay{position:fixed;inset:0;z-index:99;pointer-events:none;display:none}
+body.bell-active .bell-flash-overlay{display:block;background:rgba(255,0,0,0.15);animation:bellFlash 0.6s ease-in-out infinite}
+@keyframes bellFlash{0%,100%{opacity:0.2}50%{opacity:0.6}}
+.bell-border{position:fixed;inset:0;z-index:99;pointer-events:none;display:none;border:8px solid var(--danger)}
+body.bell-active .bell-border{display:block;animation:borderFlash 0.5s ease-in-out infinite}
+@keyframes borderFlash{0%,100%{border-color:#ff0000;box-shadow:inset 0 0 80px rgba(255,0,0,0.5),0 0 40px rgba(255,0,0,0.4)}50%{border-color:#ffff00;box-shadow:inset 0 0 120px rgba(255,200,0,0.7),0 0 80px rgba(255,200,0,0.6)}}
+body.bell-active .display-header{animation:headerFlash 0.5s ease-in-out infinite}
+@keyframes headerFlash{0%,100%{background:linear-gradient(135deg,rgba(var(--primary-dark-rgb),0.95),rgba(var(--bg-solid-rgb),0.95))}50%{background:linear-gradient(135deg,rgba(255,0,0,0.7),rgba(120,0,0,0.85))}}
+body.bell-active .clock-widget,body.bell-active .activity-progress-mini,body.bell-active .schedule-card.active{animation:cardFlash 0.5s ease-in-out infinite}
+@keyframes cardFlash{0%,100%{box-shadow:0 4px 20px rgba(255,0,0,0.4);border-color:rgba(255,0,0,0.6)}50%{box-shadow:0 4px 40px rgba(255,200,0,0.6);border-color:rgba(255,200,0,0.8)}}
+body.bell-active .clock-time{animation:textFlash 0.5s ease-in-out infinite}
+@keyframes textFlash{0%,100%{background:linear-gradient(135deg,#ff0000,#ff8c42);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 10px rgba(255,0,0,0.8))}50%{background:linear-gradient(135deg,#ffff00,#fff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 20px rgba(255,255,0,0.9))}}
+body.bell-active .clock-seconds{animation:secondsFlash 0.5s ease-in-out infinite}
+@keyframes secondsFlash{0%,100%{color:#ff0000}50%{color:#ffff00}}
+.display-container{position:relative;z-index:10;width:100vw;height:100vh;height:100dvh;display:grid;grid-template-rows:auto 1fr auto;gap:0}
+.display-header{display:grid;grid-template-columns:1fr auto 1r;align-items:center;padding:14px 28px;background:linear-gradient(135deg,rgba(var(--primary-dark-rgb),0.95),rgba(var(--bg-solid-rgb),0.95));border-bottom:3px solid var(--accent);box-shadow:0 4px 24px rgba(0,0,0,0.4)}
+.header-left{display:flex;align-items:center;gap:14px}
+.school-logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-3));display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:#1a1a1a;font-weight:900;box-shadow:0 6px 20px rgba(var(--accent-rgb),0.4);flex-shrink:0}
+.school-info h1{font-size:1.4rem;font-weight:800;line-height:1.1;letter-spacing:-0.3px;background:linear-gradient(90deg,#fff,var(--accent-2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.school-info .subtitle{font-size:0.78rem;color:var(--text-muted);margin-top:3px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.school-info .subtitle span{display:flex;align-items:center;gap:4px}
+.school-info .subtitle i{color:var(--primary-light);font-size:0.7rem}
+.header-center{text-align:center;padding:0 20px}
+.header-center .arabic{font-family:'Amiri',serif;font-size:1.2rem;color:var(--accent);margin-bottom:2px}
+.header-center .motto{font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:2px}
+.header-right{display:flex;align-items:center;justify-content:flex-end;gap:16px}
+.datetime-box{text-align:right;background:rgba(0,0,0,0.3);padding:8px 16px;border-radius:10px;border:1px solid rgba(var(--accent-rgb),0.2)}
+.datetime-box .day-date{font-size:0.95rem;color:var(--accent);font-weight:700;text-transform:capitalize}
+.datetime-box .time{font-family:'Orbitron',sans-serif;font-size:1.3rem;font-weight:700;color:#fff;margin-top:2px;letter-spacing:1px}
+.settings-btn{width:44px;height:44px;border-radius:10px;border:1px solid var(--accent);background:rgba(var(--accent-rgb),0.12);color:var(--accent);font-size:1rem;cursor:pointer;transition:var(--transition);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.settings-btn:hover{background:var(--accent);color:#1a1a1a;transform:rotate(45deg)}
+.main-content{display:grid;grid-template-columns:1fr 1.3fr 1fr;gap:16px;padding:16px 20px;overflow:hidden}
+.schedule-column{display:flex;flex-direction:column;gap:10px;overflow:hidden}
+.column-title{background:linear-gradient(135deg,var(--primary-dark),var(--primary));padding:10px 16px;border-radius:10px;text-align:center;font-weight:700;font-size:0.9rem;text-transform:uppercase;letter-spacing:1.5px;box-shadow:0 4px 12px rgba(0,0,0,0.3);border:1px solid rgba(var(--accent-rgb),0.3);display:flex;align-items:center;justify-content:center;gap:10px;flex-shrink:0}
+.column-title i{color:var(--accent)}
+.schedule-list{flex:1;display:flex;flex-direction:column;gap:8px;overflow-y:auto;padding-right:4px}
+.schedule-card{background:linear-gradient(135deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03));border:1px solid var(--card-border);border-radius:12px;padding:12px 14px;transition:var(--transition);position:relative;overflow:hidden;flex-shrink:0}
+.schedule-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--primary-light)}
+.schedule-card.active{background:linear-gradient(135deg,rgba(var(--accent-rgb),0.18),rgba(var(--accent-rgb),0.05));border-color:var(--accent);box-shadow:0 4px 20px rgba(var(--accent-rgb),0.2);transform:scale(1.02)}
+.schedule-card.active::before{background:var(--accent);width:5px}
+.schedule-card.next::before{background:var(--accent-3)}
+.schedule-card .class-name{font-size:1rem;font-weight:700;color:#fff;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.schedule-card .class-name .badge{font-size:0.6rem;padding:2px 8px;background:var(--accent);color:#1a1a1a;border-radius:50px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap}
+.schedule-card.next .class-name .badge{background:var(--accent-3)}
+.schedule-card .class-time{font-family:'Orbitron',sans-serif;font-size:0.85rem;color:var(--accent-2);margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.schedule-card .class-subject{font-size:0.85rem;color:var(--text-muted);font-weight:500}
+.schedule-card .class-subject i{color:var(--primary-light);margin-right:4px}
+.center-column{display:flex;flex-direction:column;gap:12px;overflow:hidden}
+.building-image{flex:1;border-radius:16px;overflow:hidden;position:relative;background:linear-gradient(135deg,var(--primary-dark),var(--bg-solid));border:1px solid var(--card-border);box-shadow:0 12px 40px rgba(0,0,0,0.4);min-height:200px}
+.building-image .slide{position:absolute;inset:0;opacity:0;transition:opacity 1.5s ease;background-size:cover;background-position:center}
+.building-image .slide.active{opacity:1}
+.building-image .slide-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.5s ease}
+.building-image .slide-video.active{opacity:1}
+.building-image .slide-yt{position:absolute;inset:0;width:100%;height:100%;border:0;opacity:0;transition:opacity 1.5s ease}
+.building-image .slide-yt.active{opacity:1}
+.building-image::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,rgba(var(--bg-solid-rgb),0.9));pointer-events:none;z-index:2}
+.slide-indicators{position:absolute;top:12px;right:12px;display:flex;gap:6px;z-index:3}
+.slide-indicator{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.4);transition:var(--transition)}
+.slide-indicator.active{background:var(--accent);width:24px;border-radius:10px}
+.building-caption{position:absolute;bottom:0;left:0;right:0;padding:16px 20px;z-index:3}
+.building-caption h2{font-size:1.3rem;font-weight:800;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,0.8)}
+.building-caption p{font-size:0.8rem;color:var(--accent-2);margin-top:4px;text-shadow:0 2px 8px rgba(0,0,0,0.8)}
+.clock-widget{background:linear-gradient(135deg,rgba(var(--primary-dark-rgb),0.6),rgba(var(--bg-solid-rgb),0.6));border:1px solid var(--card-border);border-radius:14px;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;backdrop-filter:blur(10px);flex-shrink:0}
+.clock-widget .clock-time{font-family:'Orbitron',sans-serif;font-size:2rem;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
+.clock-widget .clock-seconds{font-family:'Orbitron',sans-serif;font-size:1.1rem;color:var(--accent-3)}
+.clock-widget .clock-label{font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:2px;margin-top:4px}
+.clock-widget .clock-icon{font-size:1.8rem;color:var(--accent);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.6;transform:scale(0.95)}}
+.activity-progress-mini{background:rgba(255,255,255,0.05);border-radius:10px;padding:10px 14px;border:1px solid var(--card-border);flex-shrink:0}
+.activity-progress-mini .label{font-size:0.7rem;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;display:flex;justify-content:space-between;gap:8px}
+.progress-bar-mini{height:6px;background:rgba(255,255,255,0.1);border-radius:10px;overflow:hidden;position:relative}
+.progress-bar-mini-fill{height:100%;background:linear-gradient(90deg,var(--primary-light),var(--accent));border-radius:10px;transition:width 1s linear;position:relative}
+.progress-bar-mini-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent);animation:shimmer 2s linear infinite}
+@keyframes shimmer{to{transform:translateX(100%)}}
+.display-footer{background:linear-gradient(135deg,rgba(var(--primary-dark-rgb),0.95),rgba(var(--bg-solid-rgb),0.95));border-top:3px solid var(--accent);padding:10px 20px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.footer-section{display:flex;align-items:center;gap:12px;padding:6px 14px;background:rgba(0,0,0,0.3);border-radius:10px;overflow:hidden}
+.footer-section .footer-icon{width:32px;height:32px;border-radius:8px;background:var(--accent);color:#1a1a1a;display:flex;align-items:center;justify-content:center;font-size:0.85rem;flex-shrink:0}
+.footer-section .footer-icon.red{background:var(--accent-3)}
+.footer-section .footer-text{flex:1;overflow:hidden;white-space:nowrap;position:relative}
+.footer-section .footer-text .ticker-text{display:inline-block;animation:scrollText 25s linear infinite;font-size:0.85rem;color:var(--text)}
+.footer-section .footer-text .ticker-text strong{color:var(--accent);margin-right:8px}
+@keyframes scrollText{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}
+.settings-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);z-index:100;opacity:0;pointer-events:none;transition:opacity 0.3s ease}
+.settings-overlay.active{opacity:1;pointer-events:auto}
+.settings-panel{position:fixed;top:0;right:0;width:500px;max-width:100vw;height:100vh;height:100dvh;background:linear-gradient(135deg,#0a1f1a,#1a2e28);border-left:1px solid var(--accent);box-shadow:-20px 0 60px rgba(0,0,0,0.6);z-index:101;transform:translateX(100%);transition:transform 0.4s cubic-bezier(0.4,0,0.2,1);display:flex;flex-direction:column;overflow:hidden}
+.settings-panel.active{transform:translateX(0)}
+.settings-header{padding:20px 24px;background:linear-gradient(135deg,var(--primary-dark),var(--primary));display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid var(--accent);flex-shrink:0}
+.settings-header h2{font-size:1.2rem;font-weight:700;display:flex;align-items:center;gap:10px}
+.settings-header h2 i{color:var(--accent)}
+.close-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--card-border);background:rgba(0,0,0,0.3);color:var(--text);cursor:pointer;transition:var(--transition);font-size:0.95rem}
+.close-btn:hover{background:var(--danger);border-color:var(--danger)}
+.settings-tabs{display:flex;padding:0 16px;gap:2px;border-bottom:1px solid var(--card-border);background:rgba(0,0,0,0.2);overflow-x:auto;flex-shrink:0}
+.tab-btn{padding:12px 12px;background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-size:0.82rem;font-weight:500;transition:var(--transition);border-bottom:2px solid transparent;display:flex;align-items:center;gap:6px;white-space:nowrap;font-family:inherit}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.settings-body{flex:1;overflow-y:auto;padding:20px 24px;-webkit-overflow-scrolling:touch}
+.settings-section{display:none;animation:fadeIn 0.4s ease}
+.settings-section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.form-group{margin-bottom:18px}
+.form-group label{display:block;font-size:0.75rem;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px;font-weight:500}
+.form-control{width:100%;padding:11px 14px;background:rgba(255,255,255,0.06);border:1px solid var(--card-border);border-radius:10px;color:var(--text);font-size:16px;font-family:inherit;transition:var(--transition)}
+.form-control:focus{outline:none;border-color:var(--accent);background:rgba(255,255,255,0.08)}
+textarea.form-control{resize:vertical;min-height:70px;font-family:inherit}
+.color-input-group{display:flex;align-items:center;gap:10px}
+.color-input-group input[type="color"]{width:50px;height:40px;border:1px solid var(--card-border);border-radius:10px;background:transparent;cursor:pointer;padding:2px}
+.color-input-group input[type="color"]::-webkit-color-swatch{border-radius:8px;border:none}
+.color-input-group .color-text{flex:1;padding:10px 14px;background:rgba(255,255,255,0.06);border:1px solid var(--card-border);border-radius:10px;color:var(--text);font-family:'Orbitron',sans-serif;font-size:0.85rem}
+.color-presets{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.color-preset{width:28px;height:28px;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:var(--transition)}
+.color-preset:hover{transform:scale(1.1);border-color:rgba(255,255,255,0.3)}
+.color-preview-box{margin-top:12px;padding:16px;border-radius:12px;border:1px solid var(--card-border);background:linear-gradient(135deg,var(--primary-dark),var(--primary));text-align:center;font-weight:700;color:#fff;font-size:0.9rem}
+.btn{padding:11px 18px;border:none;border-radius:10px;cursor:pointer;font-size:0.85rem;font-weight:600;transition:var(--transition);display:inline-flex;align-items:center;gap:8px;font-family:inherit}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#e6a820);color:#1a1a1a}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(var(--accent-rgb),0.4)}
+.btn-secondary{background:rgba(255,255,255,0.06);color:var(--text);border:1px solid var(--card-border)}
+.btn-secondary:hover{background:rgba(255,255,255,0.1)}
+.btn-danger{background:rgba(255,82,82,0.15);color:var(--danger);border:1px solid rgba(255,82,82,0.3)}
+.btn-danger:hover{background:var(--danger);color:#fff}
+.btn-block{width:100%;justify-content:center}
+.theme-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.theme-card{border-radius:12px;padding:14px;cursor:pointer;border:2px solid transparent;transition:var(--transition);position:relative;overflow:hidden;background:rgba(255,255,255,0.04)}
+.theme-card .theme-colors{display:flex;gap:4px;margin-bottom:8px}
+.theme-card .theme-color{width:24px;height:24px;border-radius:6px}
+.theme-card .theme-name{font-size:0.85rem;font-weight:600;color:var(--text)}
+.theme-card.active{border-color:var(--accent);background:rgba(255,255,255,0.08)}
+.theme-card.active::after{content:'✓';position:absolute;top:6px;right:8px;color:var(--accent);font-weight:900;font-size:1rem}
+.slideshow-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.slide-slot{aspect-ratio:16/10;border-radius:10px;border:2px dashed var(--card-border);background:rgba(255,255,255,0.03);cursor:pointer;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:var(--transition)}
+.slide-slot:hover{border-color:var(--accent)}
+.slide-slot img,.slide-slot video{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.slide-slot .slot-content{text-align:center;z-index:1}
+.slide-slot .slot-content i{font-size:1.2rem;color:var(--accent);margin-bottom:4px}
+.slide-slot .slot-content p{font-size:0.7rem;color:var(--text-muted)}
+.slide-slot .remove-btn{position:absolute;top:4px;right:4px;width:22px;height:22px;background:rgba(255,82,82,0.9);color:#fff;border:none;border-radius:50%;cursor:pointer;font-size:0.65rem;z-index:2;display:flex;align-items:center;justify-content:center}
+.slide-slot .media-badge{position:absolute;bottom:4px;left:4px;padding:2px 8px;background:rgba(0,0,0,0.7);border-radius:50px;font-size:0.6rem;color:var(--accent);z-index:2;display:flex;align-items:center;gap:3px}
+.slide-slot .yt-preview{width:100%;height:100%;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#000}
+.slide-slot .yt-preview i{font-size:2rem;color:#ff0000}
+.bell-slot{background:rgba(255,255,255,0.05);border:1px solid var(--card-border);border-radius:12px;padding:14px;margin-bottom:12px}
+.bell-slot .bell-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.bell-slot .bell-name{font-size:0.95rem;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:8px}
+.bell-slot .bell-name i{font-size:0.9rem}
+.bell-slot .bell-content{display:grid;grid-template-columns:1fr 2fr;gap:10px;align-items:center}
+.bell-slot input[type="time"]{padding:8px 12px;background:rgba(255,255,255,0.06);border:1px solid var(--card-border);border-radius:8px;color:var(--text);font-family:'Orbitron',sans-serif;font-size:0.95rem;width:100%}
+.bell-slot .bell-actions{display:flex;gap:6px;align-items:center;margin-top:8px}
+.bell-slot .file-name{font-size:0.7rem;color:var(--text-muted);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bell-file-upload{position:relative}
+.bell-file-upload input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.bell-file-btn{padding:6px 10px;background:rgba(255,255,255,0.06);border:1px solid var(--card-border);border-radius:6px;color:var(--text);font-size:0.75rem;cursor:pointer;display:flex;align-items:center;gap:4px;width:100%;justify-content:center}
+.wallpaper-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.wallpaper-item{aspect-ratio:16/10;border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid transparent;position:relative;transition:var(--transition)}
+.wallpaper-item img,.wallpaper-item .gradient-preview{width:100%;height:100%;object-fit:cover}
+.wallpaper-item:hover{transform:scale(1.05)}
+.wallpaper-item.active{border-color:var(--accent)}
+.wallpaper-item .check{position:absolute;top:5px;right:5px;width:22px;height:22px;background:var(--accent);border-radius:50%;display:none;align-items:center;justify-content:center;color:#1a1a1a;font-size:0.7rem}
+.wallpaper-item.active .check{display:flex}
+.alarm-list,.schedule-list-settings{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.alarm-item{background:rgba(255,255,255,0.05);border:1px solid var(--card-border);border-radius:12px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;transition:var(--transition)}
+.alarm-item:hover{background:rgba(255,255,255,0.08)}
+.alarm-info{flex:1;min-width:0}
+.alarm-time{font-family:'Orbitron',sans-serif;font-size:1.2rem;font-weight:700;color:var(--accent)}
+.alarm-details{font-size:0.75rem;color:var(--text-muted);margin-top:3px;word-break:break-word}
+.alarm-actions{display:flex;gap:6px;flex-shrink:0}
+.icon-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text);cursor:pointer;transition:var(--transition);display:flex;align-items:center;justify-content:center;font-size:0.8rem}
+.icon-btn:hover{background:rgba(255,255,255,0.1)}
+.toggle-switch{position:relative;width:44px;height:24px;background:rgba(255,255,255,0.1);border-radius:50px;cursor:pointer;transition:var(--transition);flex-shrink:0}
+.toggle-switch.active{background:var(--success)}
+.toggle-switch::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:var(--transition)}
+.toggle-switch.active::after{transform:translateX(20px)}
+.file-upload{position:relative;display:block}
+.file-upload input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.upload-area{border:2px dashed var(--card-border);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:var(--transition);background:rgba(255,255,255,0.03)}
+.upload-area:hover{border-color:var(--accent)}
+.upload-area i{font-size:1.3rem;color:var(--accent);margin-bottom:6px}
+.upload-area p{font-size:0.8rem;color:var(--text-muted)}
+.slider-container{display:flex;align-items:center;gap:12px}
+.slider{flex:1;-webkit-appearance:none;appearance:none;height:6px;background:rgba(255,255,255,0.1);border-radius:10px;outline:none}
+.slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:20px;height:20px;background:var(--accent);border-radius:50%;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.3)}
+.slider::-moz-range-thumb{width:20px;height:20px;background:var(--accent);border-radius:50%;cursor:pointer;border:none}
+.slider-value{font-family:'Orbitron',sans-serif;font-size:0.85rem;color:var(--accent);min-width:50px;text-align:right}
+.toast{position:fixed;top:24px;left:50%;transform:translateX(-50%) translateY(-100px);background:linear-gradient(135deg,#0a1f1a,#1a2e28);border:1px solid var(--accent);color:var(--text);padding:12px 22px;border-radius:12px;z-index:200;transition:transform 0.3s ease;display:flex;align-items:center;gap:10px;box-shadow:0 10px 40px rgba(0,0,0,0.5);font-size:0.85rem;max-width:90vw}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.success i{color:var(--success)}
+.toast.error i{color:var(--danger)}
+.toast.info i{color:var(--accent)}
+.alarm-modal{position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(10px);z-index:150;display:none;align-items:center;justify-content:center;padding:20px}
+.alarm-modal.show{display:flex}
+.alarm-modal-content{background:linear-gradient(135deg,#0a1f1a,#1a2e28);border:2px solid var(--danger);border-radius:24px;padding:36px;text-align:center;max-width:400px;width:100%;box-shadow:0 20px 80px rgba(255,0,0,0.6)}
+.alarm-icon{width:80px;height:80px;margin:0 auto 18px;border-radius:50%;background:linear-gradient(135deg,var(--danger),var(--accent-3));display:flex;align-items:center;justify-content:center;font-size:2.2rem;color:#fff;animation:ring 0.5s ease-in-out infinite;box-shadow:0 0 40px rgba(255,0,0,0.6)}
+@keyframes ring{0%,100%{transform:rotate(0) scale(1)}25%{transform:rotate(-15deg) scale(1.1)}75%{transform:rotate(15deg) scale(1.1)}}
+.alarm-modal h2{font-size:1.6rem;margin-bottom:6px;color:#fff}
+.alarm-modal p{color:var(--text-muted);margin-bottom:22px}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:rgba(0,0,0,0.2)}
+::-webkit-scrollbar-thumb{background:rgba(var(--accent-rgb),0.3);border-radius:10px}
+::-webkit-scrollbar-thumb:hover{background:rgba(var(--accent-rgb),0.5)}
+@media(max-width:1100px){.main-content{grid-template-columns:1fr 1.2fr}.schedule-column:nth-child(3){display:none}}
+@media(max-width:768px){.display-header{grid-template-columns:1fr auto;padding:10px 16px}.header-center{display:none}.main-content{grid-template-columns:1fr;grid-template-rows:auto 1fr;padding:10px}.center-column{order:-1}.schedule-column:nth-child(3){display:none}.display-footer{grid-template-columns:1fr}.school-info h1{font-size:1rem}.school-info .subtitle{font-size:0.65rem}.datetime-box .time{font-size:1.1rem}.datetime-box .day-date{font-size:0.8rem}.clock-widget .clock-time{font-size:1.5rem}.clock-widget{padding:10px 14px}.settings-panel{width:100vw}.settings-body{padding:16px}.form-control{font-size:16px}.call-display-names{font-size:1.5rem}.call-btn{bottom:70px;right:16px}}
 </style>
 </head>
 <body>
 
-<div id="audio-unlock">
-  <i class="fas fa-volume-up"></i>
-  <h2>Aktifkan Suara</h2>
-  <p>HP/browser memerlukan ketukan untuk mengaktifkan suara alarm &amp; bell.<br>Ketuk tombol di bawah sekali saja.</p>
-  <button id="unlockBtn">KETUK DI SINI</button>
-</div>
+<div id="audio-unlock"><i class="fas fa-volume-up"></i><h2>Aktifkan Suara</h2><p>HP/browser memerlukan ketukan untuk mengaktifkan suara alarm &amp; bell.<br>Ketuk tombol di bawah sekali saja.</p><button id="unlockBtn">KETUK DI SINI</button></div>
 
 <div id="wallpaper-layer"></div>
 <video id="wallpaper-video" loop muted playsinline></video>
-<div id="youtube-bg">
-  <iframe id="youtube-iframe" allow="autoplay; fullscreen; encrypted-media" allowfullscreen></iframe>
-  <div id="youtube-overlay"></div>
-</div>
+<div id="youtube-bg"><iframe id="youtube-iframe" allow="autoplay; fullscreen; encrypted-media" allowfullscreen></iframe><div id="youtube-overlay"></div></div>
 <div class="pattern-overlay"></div>
 <div class="particles" id="particles"></div>
 <div class="bell-flash-overlay"></div>
 <div class="bell-border"></div>
-
-<!-- TOMBOL PANGGIL SISWA -->
 <button class="call-btn" id="callBtn" title="Panggil Siswa"><i class="fas fa-bullhorn"></i></button>
 
 <div class="display-container">
@@ -339,87 +301,36 @@
       <button class="settings-btn" id="openSettings" title="Pengaturan"><i class="fas fa-cog"></i></button>
     </div>
   </header>
-
   <div class="main-content">
-    <div class="schedule-column">
-      <div class="column-title"><i class="fas fa-users"></i> KELAS 7</div>
-      <div class="schedule-list" id="scheduleListLeft"></div>
-    </div>
+    <div class="schedule-column"><div class="column-title"><i class="fas fa-users"></i> KELAS 7</div><div class="schedule-list" id="scheduleListLeft"></div></div>
     <div class="center-column">
-      <div class="building-image" id="buildingImage">
-        <div class="slide-indicators" id="slideIndicators"></div>
-        <div class="building-caption">
-          <h2 id="buildingTitle">Gedung Utama Sekolah</h2>
-          <p id="buildingSubtitle">Pusat kegiatan belajar mengajar</p>
-        </div>
-      </div>
-      <div class="clock-widget">
-        <div>
-          <div class="clock-time" id="clockTime">05:40</div>
-          <div class="clock-label">Waktu Sekarang</div>
-        </div>
-        <div class="clock-seconds" id="clockSeconds">36</div>
-        <div class="clock-icon"><i class="fas fa-clock"></i></div>
-      </div>
-      <div class="activity-progress-mini">
-        <div class="label">
-          <span id="currentActivityLabel">Kegiatan Saat Ini</span>
-          <span id="activityTimeLabel">05:30 - 06:30</span>
-        </div>
-        <div class="progress-bar-mini"><div class="progress-bar-mini-fill" id="progressBar" style="width: 0%"></div></div>
-      </div>
+      <div class="building-image" id="buildingImage"><div class="slide-indicators" id="slideIndicators"></div><div class="building-caption"><h2 id="buildingTitle">Gedung Utama Sekolah</h2><p id="buildingSubtitle">Pusat kegiatan belajar mengajar</p></div></div>
+      <div class="clock-widget"><div><div class="clock-time" id="clockTime">05:40</div><div class="clock-label">Waktu Sekarang</div></div><div class="clock-seconds" id="clockSeconds">36</div><div class="clock-icon"><i class="fas fa-clock"></i></div></div>
+      <div class="activity-progress-mini"><div class="label"><span id="currentActivityLabel">Kegiatan Saat Ini</span><span id="activityTimeLabel">05:30 - 06:30</span></div><div class="progress-bar-mini"><div class="progress-bar-mini-fill" id="progressBar" style="width:0%"></div></div></div>
     </div>
-    <div class="schedule-column">
-      <div class="column-title"><i class="fas fa-users"></i> KELAS 8 & 9</div>
-      <div class="schedule-list" id="scheduleListRight"></div>
-    </div>
+    <div class="schedule-column"><div class="column-title"><i class="fas fa-users"></i> KELAS 8 & 9</div><div class="schedule-list" id="scheduleListRight"></div></div>
   </div>
-
   <footer class="display-footer">
-    <div class="footer-section">
-      <div class="footer-icon"><i class="fas fa-tshirt"></i></div>
-      <div class="footer-text"><div class="ticker-text"><strong>PENGUMUMAN:</strong> <span id="footerAnnouncement1">Seluruh siswa wajib berpakaian seragam lengkap, rapi, dan bersepatu hitam saat masuk sekolah.</span></div></div>
-    </div>
-    <div class="footer-section">
-      <div class="footer-icon red"><i class="fas fa-bell"></i></div>
-      <div class="footer-text"><div class="ticker-text"><strong>INFO:</strong> <span id="footerAnnouncement2">Awal pendaftaran siswa ber 57 hari lagi. Hubungi panitia penerimaan siswa baru di ruang TU.</span></div></div>
-    </div>
+    <div class="footer-section"><div class="footer-icon"><i class="fas fa-tshirt"></i></div><div class="footer-text"><div class="ticker-text"><strong>PENGUMUMAN:</strong> <span id="footerAnnouncement1">Seluruh siswa wajib berpakaian seragam lengkap, rapi, dan bersepatu hitam saat masuk sekolah.</span></div></div></div>
+    <div class="footer-section"><div class="footer-icon red"><i class="fas fa-bell"></i></div><div class="footer-text"><div class="ticker-text"><strong>INFO:</strong> <span id="footerAnnouncement2">Awal pendaftaran siswa ber 57 hari lagi. Hubungi panitia penerimaan siswa baru di ruang TU.</span></div></div></div>
   </footer>
 </div>
 
-<!-- MODAL PANGGIL SISWA (Input) -->
 <div class="call-modal" id="callModal">
   <div class="call-modal-content">
     <h2><i class="fas fa-bullhorn"></i> Panggil Siswa</h2>
-    <div class="form-group">
-      <label>Nama Siswa (satu per baris)</label>
-      <div class="call-names-list" id="callNamesList">
-        <div class="call-name-row"><input type="text" class="form-control call-name-input" placeholder="Nama siswa..."><button class="remove-row" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button></div>
-      </div>
+    <div class="form-group"><label>Nama Siswa (satu per baris)</label>
+      <div class="call-names-list" id="callNamesList"><div class="call-name-row"><input type="text" class="form-control call-name-input" placeholder="Nama siswa..."><button class="remove-row"><i class="fas fa-times"></i></button></div></div>
       <button class="call-add-btn" id="addCallName"><i class="fas fa-plus"></i> Tambah Nama</button>
     </div>
-    <div class="form-group">
-      <label>Pesan / Tujuan (opsional)</label>
-      <input type="text" class="form-control" id="callMessage" placeholder="Contoh: Silakan ke ruang guru">
-    </div>
-    <div class="form-group">
-      <label>Durasi Tampil</label>
-      <select class="form-control" id="callDuration">
-        <option value="10">10 detik</option>
-        <option value="15">15 detik</option>
-        <option value="30" selected>30 detik</option>
-        <option value="60">60 detik</option>
-        <option value="0">Manual (tutup sendiri)</option>
-      </select>
-    </div>
-    <div class="call-actions">
-      <button class="btn btn-secondary" id="cancelCall"><i class="fas fa-times"></i> Batal</button>
-      <button class="btn btn-primary" id="executeCall"><i class="fas fa-bullhorn"></i> PANGGIL!</button>
-    </div>
+    <div class="form-group"><label>Pesan / Tujuan (opsional)</label><input type="text" class="form-control" id="callMessage" placeholder="Contoh: Silakan ke ruang guru"></div>
+    <div class="form-group"><label>Durasi Tampil</label><select class="form-control" id="callDuration"><option value="10">10 detik</option><option value="15">15 detik</option><option value="30" selected>30 detik</option><option value="60">60 detik</option><option value="0">Manual (tutup sendiri)</option></select></div>
+    <div class="form-group"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:none;font-size:0.9rem;color:var(--text);"><input type="checkbox" id="callVoiceEnabled" checked style="width:20px;height:20px;cursor:pointer;"><span>🔊 Bacakan dengan suara (Text-to-Speech)</span></label></div>
+    <div class="form-group" id="voiceSettingsGroup"><label>Ulangi Panggilan</label><select class="form-control" id="callRepeat"><option value="1">1 kali</option><option value="2" selected>2 kali</option><option value="3">3 kali</option><option value="5">5 kali</option></select><button class="btn btn-secondary btn-block" id="testVoiceBtn" style="margin-top:8px;"><i class="fas fa-volume-up"></i> Tes Suara</button><p style="font-size:0.7rem;color:var(--text-muted);margin-top:6px;">Suara tergantung browser. Chrome &amp; Edge punya suara Indonesia terbaik.</p></div>
+    <div class="call-actions"><button class="btn btn-secondary" id="cancelCall"><i class="fas fa-times"></i> Batal</button><button class="btn btn-primary" id="executeCall"><i class="fas fa-bullhorn"></i> PANGGIL!</button></div>
   </div>
 </div>
 
-<!-- DISPLAY PANGGIL SISWA (Overlay) -->
 <div class="call-display" id="callDisplay">
   <div class="call-display-border"></div>
   <div class="call-display-content">
@@ -434,10 +345,7 @@
 
 <div class="settings-overlay" id="settingsOverlay"></div>
 <aside class="settings-panel" id="settingsPanel">
-  <div class="settings-header">
-    <h2><i class="fas fa-cog"></i> Pengaturan</h2>
-    <button class="close-btn" id="closeSettings"><i class="fas fa-times"></i></button>
-  </div>
+  <div class="settings-header"><h2><i class="fas fa-cog"></i> Pengaturan</h2><button class="close-btn" id="closeSettings"><i class="fas fa-times"></i></button></div>
   <div class="settings-tabs">
     <button class="tab-btn active" data-tab="general"><i class="fas fa-school"></i> Umum</button>
     <button class="tab-btn" data-tab="theme"><i class="fas fa-palette"></i> Tema</button>
@@ -509,182 +417,86 @@
   </div>
 </aside>
 
-<div class="alarm-modal" id="alarmModal">
-  <div class="alarm-modal-content">
-    <div class="alarm-icon"><i class="fas fa-bell"></i></div>
-    <h2 id="alarmModalTitle">Alarm!</h2>
-    <p id="alarmModalLabel">Waktunya</p>
-    <button class="btn btn-primary btn-block" id="stopAlarm" style="background:linear-gradient(135deg,var(--danger),#c82333);color:white;"><i class="fas fa-stop"></i> Hentikan</button>
-  </div>
-</div>
-
+<div class="alarm-modal" id="alarmModal"><div class="alarm-modal-content"><div class="alarm-icon"><i class="fas fa-bell"></i></div><h2 id="alarmModalTitle">Alarm!</h2><p id="alarmModalLabel">Waktunya</p><button class="btn btn-primary btn-block" id="stopAlarm" style="background:linear-gradient(135deg,var(--danger),#c82333);color:#fff;"><i class="fas fa-stop"></i> Hentikan</button></div></div>
 <div class="toast" id="toast"><i class="fas fa-info-circle"></i><span id="toastMessage">Pesan</span></div>
 
 <script>
-const themes=[
-  {id:'islamic-green',name:'Hijau Islamic',bgSolid:'#061512',bgOverlay:'#061810',primary:'#1a8a6f',primaryDark:'#0d5240',primaryLight:'#4dd0a8',accent:'#f4c430',accent2:'#ffd966',accent3:'#ff8c42'},
-  {id:'royal-blue',name:'Biru Royal',bgSolid:'#080f23',bgOverlay:'#0a1530',primary:'#2563eb',primaryDark:'#1e40af',primaryLight:'#60a5fa',accent:'#fbbf24',accent2:'#fcd34d',accent3:'#f97316'},
-  {id:'royal-purple',name:'Ungu Royal',bgSolid:'#140a23',bgOverlay:'#1a1030',primary:'#7c3aed',primaryDark:'#5b21b6',primaryLight:'#a78bfa',accent:'#fbbf24',accent2:'#fde047',accent3:'#fb7185'},
-  {id:'sunset-orange',name:'Sunset Orange',bgSolid:'#1e0f05',bgOverlay:'#2a1505',primary:'#ea580c',primaryDark:'#9a3412',primaryLight:'#fb923c',accent:'#facc15',accent2:'#fde047',accent3:'#dc2626'},
-  {id:'crimson-red',name:'Merah Crimson',bgSolid:'#1e0505',bgOverlay:'#2a0808',primary:'#dc2626',primaryDark:'#991b1b',primaryLight:'#f87171',accent:'#fbbf24',accent2:'#fcd34d',accent3:'#f97316'},
-  {id:'teal-ocean',name:'Teal Ocean',bgSolid:'#05191e',bgOverlay:'#05252a',primary:'#0d9488',primaryDark:'#115e59',primaryLight:'#5eead4',accent:'#f59e0b',accent2:'#fbbf24',accent3:'#fb7185'},
-  {id:'dark-gold',name:'Emas Gelap',bgSolid:'#140f05',bgOverlay:'#1a1508',primary:'#a16207',primaryDark:'#713f12',primaryLight:'#fde047',accent:'#facc15',accent2:'#fde047',accent3:'#ea580c'},
-  {id:'midnight-indigo',name:'Indigo Malam',bgSolid:'#0a0a1e',bgOverlay:'#0e1030',primary:'#4338ca',primaryDark:'#312e81',primaryLight:'#818cf8',accent:'#22d3ee',accent2:'#67e8f9',accent3:'#f472b6'}
-];
-const colorPresets={
-  bgSolid:['#061512','#080f23','#140a23','#1e0f05','#1e0505','#05191e','#140f05','#0a0a1e','#1a1a2e','#000000','#0d1b2a','#1b263b','#0f0f1e','#1a0b2e','#0a1f1a'],
-  primary:['#1a8a6f','#2563eb','#7c3aed','#ea580c','#dc2626','#0d9488','#a16207','#4338ca','#059669','#0891b2','#7c2d12','#9333ea','#0284c7','#16a34a','#ca8a04'],
-  accent:['#f4c430','#fbbf24','#22d3ee','#a78bfa','#f97316','#10b981','#ec4899','#06b6d4','#84cc16','#f59e0b','#ef4444','#8b5cf6','#14b8a6','#facc15','#fb7185']
-};
-const state={
-  school:{name:'PPTQ JASMA DIGITAL',address:'Jl. Pendidikan No. 123, Indonesia',website:'www.pptq-jasma.sch.id',logo:'PJ',arabic:'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',motto:'Belajar • Beriman • Beramal'},
-  theme:'islamic-green',
-  customColors:{bgSolid:'#061512',bgOverlay:'#061810',primary:'#1a8a6f',primaryDark:'#0d5240',primaryLight:'#4dd0a8',accent:'#f4c430',accent2:'#ffd966',accent3:'#ff8c42'},
-  wallpaper:{type:'preset',value:'gradient1',custom:null,overlay:82},
-  bgVideo:null,youtubeUrl:'',ytOverlay:30,
-  slideshow:{media:[],interval:8,currentIndex:0},
-  building:{title:'Gedung Utama Sekolah',subtitle:'Pusat kegiatan belajar mengajar'},
-  volume:80,
-  announcements:{left:'Seluruh siswa wajib berpakaian seragam lengkap, rapi, dan bersepatu hitam saat masuk sekolah.',right:'Awal pendaftaran siswa ber 57 hari lagi. Hubungi panitia penerimaan siswa baru di ruang TU.'},
-  bells:{'masuk':{time:'07:00',label:'Jam Masuk Sekolah',music:null,musicName:'',enabled:true},'istirahat1':{time:'09:30',label:'Jam Istirahat 1',music:null,musicName:'',enabled:true},'ganti1':{time:'09:45',label:'Ganti Pelajaran 1',music:null,musicName:'',enabled:true},'ganti2':{time:'10:45',label:'Ganti Pelajaran 2',music:null,musicName:'',enabled:true},'istirahat2':{time:'11:30',label:'Jam Istirahat 2',music:null,musicName:'',enabled:true},'ganti3':{time:'12:30',label:'Ganti Pelajaran 3',music:null,musicName:'',enabled:true},'ganti4':{time:'13:30',label:'Ganti Pelajaran 4',music:null,musicName:'',enabled:true},'ganti5':{time:'14:30',label:'Ganti Pelajaran 5',music:null,musicName:'',enabled:true},'pulang':{time:'15:30',label:'Jam Pulang Sekolah',music:null,musicName:'',enabled:true}},
-  bellTriggered:{},alarms:[],schedules:[]
-};
-const presetWallpapers=[
-  {id:'gradient1',name:'Islamic Green',url:'linear-gradient(135deg, #0d5240, #1a8a6f, #4dd0a8)',type:'gradient'},
-  {id:'gradient2',name:'Sunrise Amber',url:'linear-gradient(135deg, #1a1a2e, #c9a25c, #e8b04b)',type:'gradient'},
-  {id:'gradient3',name:'Deep Ocean',url:'linear-gradient(135deg, #0c3559, #117eb0, #6dd5ed)',type:'gradient'},
-  {id:'gradient4',name:'Purple Dream',url:'linear-gradient(135deg, #2c1810, #8b5cf6, #ec4899)',type:'gradient'},
-  {id:'gradient5',name:'Dark Forest',url:'linear-gradient(135deg, #0f2027, #203a43, #2c5364)',type:'gradient'},
-  {id:'photo1',name:'School Building',url:'https://images.unsplash.com/photo-1562774053-701439336967?w=1920',type:'image'},
-  {id:'photo2',name:'Library',url:'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=1920',type:'image'},
-  {id:'photo3',name:'Classroom',url:'https://images.unsplash.com/photo-1580582932707-520aed937d7b?w=1920',type:'image'},
-  {id:'photo4',name:'Mosque',url:'https://images.unsplash.com/photo-1542818831-43c7f87d5d0d?w=1920',type:'image'}
-];
-const defaultSchedules=[
-  {id:1,class:'KELAS 7-1',subject:'B. JERMAN',start:'05:30',end:'06:30',column:'left'},
-  {id:2,class:'KELAS 7-2',subject:'B. ARAB',start:'05:30',end:'07:15',column:'left'},
-  {id:3,class:'KELAS 7-3',subject:'TAHSIN',start:'06:30',end:'07:30',column:'left'},
-  {id:4,class:'KELAS 7-4',subject:'MATEMATIKA',start:'07:30',end:'09:00',column:'left'},
-  {id:5,class:'KELAS 7-5',subject:'IPA TERPADU',start:'09:00',end:'10:30',column:'left'},
-  {id:6,class:'KELAS 8-1',subject:'B. INGGRIS',start:'05:30',end:'06:30',column:'right'},
-  {id:7,class:'KELAS 8-3',subject:'B. TURKEY',start:'05:30',end:'07:15',column:'right'},
-  {id:8,class:'KELAS 8-2',subject:'FIQH',start:'06:30',end:'07:30',column:'right'},
-  {id:9,class:'KELAS 9-1',subject:'AKIDAH AKHLAK',start:'07:30',end:'09:00',column:'right'},
-  {id:10,class:'KELAS 9-2',subject:'PKn',start:'09:00',end:'10:30',column:'right'}
-];
+var themes=[{id:'islamic-green',name:'Hijau Islamic',bgSolid:'#061512',bgOverlay:'#061810',primary:'#1a8a6f',primaryDark:'#0d5240',primaryLight:'#4dd0a8',accent:'#f4c430',accent2:'#ffd966',accent3:'#ff8c42'},{id:'royal-blue',name:'Biru Royal',bgSolid:'#080f23',bgOverlay:'#0a1530',primary:'#2563eb',primaryDark:'#1e40af',primaryLight:'#60a5fa',accent:'#fbbf24',accent2:'#fcd34d',accent3:'#f97316'},{id:'royal-purple',name:'Ungu Royal',bgSolid:'#140a23',bgOverlay:'#1a1030',primary:'#7c3aed',primaryDark:'#5b21b6',primaryLight:'#a78bfa',accent:'#fbbf24',accent2:'#fde047',accent3:'#fb7185'},{id:'sunset-orange',name:'Sunset Orange',bgSolid:'#1e0f05',bgOverlay:'#2a1505',primary:'#ea580c',primaryDark:'#9a3412',primaryLight:'#fb923c',accent:'#facc15',accent2:'#fde047',accent3:'#dc2626'},{id:'crimson-red',name:'Merah Crimson',bgSolid:'#1e0505',bgOverlay:'#2a0808',primary:'#dc2626',primaryDark:'#991b1b',primaryLight:'#f87171',accent:'#fbbf24',accent2:'#fcd34d',accent3:'#f97316'},{id:'teal-ocean',name:'Teal Ocean',bgSolid:'#05191e',bgOverlay:'#05252a',primary:'#0d9488',primaryDark:'#115e59',primaryLight:'#5eead4',accent:'#f59e0b',accent2:'#fbbf24',accent3:'#fb7185'},{id:'dark-gold',name:'Emas Gelap',bgSolid:'#140f05',bgOverlay:'#1a1508',primary:'#a16207',primaryDark:'#713f12',primaryLight:'#fde047',accent:'#facc15',accent2:'#fde047',accent3:'#ea580c'},{id:'midnight-indigo',name:'Indigo Malam',bgSolid:'#0a0a1e',bgOverlay:'#0e1030',primary:'#4338ca',primaryDark:'#312e81',primaryLight:'#818cf8',accent:'#22d3ee',accent2:'#67e8f9',accent3:'#f472b6'}];
+var colorPresets={bgSolid:['#061512','#080f23','#140a23','#1e0f05','#1e0505','#05191e','#140f05','#0a0a1e','#1a1a2e','#000000','#0d1b2a','#1b263b','#0f0f1e','#1a0b2e','#0a1f1a'],primary:['#1a8a6f','#2563eb','#7c3aed','#ea580c','#dc2626','#0d9488','#a16207','#4338ca','#059669','#0891b2','#7c2d12','#9333ea','#0284c7','#16a34a','#ca8a04'],accent:['#f4c430','#fbbf24','#22d3ee','#a78bfa','#f97316','#10b981','#ec4899','#06b6d4','#84cc16','#f59e0b','#ef4444','#8b5cf6','#14b8a6','#facc15','#fb7185']};
+var state={school:{name:'PPTQ JASMA DIGITAL',address:'Jl. Pendidikan No. 123, Indonesia',website:'www.pptq-jasma.sch.id',logo:'PJ',arabic:'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',motto:'Belajar • Beriman • Beramal'},theme:'islamic-green',customColors:{bgSolid:'#061512',bgOverlay:'#061810',primary:'#1a8a6f',primaryDark:'#0d5240',primaryLight:'#4dd0a8',accent:'#f4c430',accent2:'#ffd966',accent3:'#ff8c42'},wallpaper:{type:'preset',value:'gradient1',custom:null,overlay:82},bgVideo:null,youtubeUrl:'',ytOverlay:30,slideshow:{media:[],interval:8,currentIndex:0},building:{title:'Gedung Utama Sekolah',subtitle:'Pusat kegiatan belajar mengajar'},volume:80,announcements:{left:'Seluruh siswa wajib berpakaian seragam lengkap, rapi, dan bersepatu hitam saat masuk sekolah.',right:'Awal pendaftaran siswa ber 57 hari lagi. Hubungi panitia penerimaan siswa baru di ruang TU.'},bells:{'masuk':{time:'07:00',label:'Jam Masuk Sekolah',music:null,musicName:'',enabled:true},'istirahat1':{time:'09:30',label:'Jam Istirahat 1',music:null,musicName:'',enabled:true},'ganti1':{time:'09:45',label:'Ganti Pelajaran 1',music:null,musicName:'',enabled:true},'ganti2':{time:'10:45',label:'Ganti Pelajaran 2',music:null,musicName:'',enabled:true},'istirahat2':{time:'11:30',label:'Jam Istirahat 2',music:null,musicName:'',enabled:true},'ganti3':{time:'12:30',label:'Ganti Pelajaran 3',music:null,musicName:'',enabled:true},'ganti4':{time:'13:30',label:'Ganti Pelajaran 4',music:null,musicName:'',enabled:true},'ganti5':{time:'14:30',label:'Ganti Pelajaran 5',music:null,musicName:'',enabled:true},'pulang':{time:'15:30',label:'Jam Pulang Sekolah',music:null,musicName:'',enabled:true}},bellTriggered:{},alarms:[],schedules:[]};
+var presetWallpapers=[{id:'gradient1',name:'Islamic Green',url:'linear-gradient(135deg, #0d5240, #1a8a6f, #4dd0a8)',type:'gradient'},{id:'gradient2',name:'Sunrise Amber',url:'linear-gradient(135deg, #1a1a2e, #c9a25c, #e8b04b)',type:'gradient'},{id:'gradient3',name:'Deep Ocean',url:'linear-gradient(135deg, #0c3559, #117eb0, #6dd5ed)',type:'gradient'},{id:'gradient4',name:'Purple Dream',url:'linear-gradient(135deg, #2c1810, #8b5cf6, #ec4899)',type:'gradient'},{id:'gradient5',name:'Dark Forest',url:'linear-gradient(135deg, #0f2027, #203a43, #2c5364)',type:'gradient'},{id:'photo1',name:'School Building',url:'https://images.unsplash.com/photo-1562774053-701439336967?w=1920',type:'image'},{id:'photo2',name:'Library',url:'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=1920',type:'image'},{id:'photo3',name:'Classroom',url:'https://images.unsplash.com/photo-1580582932707-520aed937d7b?w=1920',type:'image'},{id:'photo4',name:'Mosque',url:'https://images.unsplash.com/photo-1542818831-43c7f87d5d0d?w=1920',type:'image'}];
+var defaultSchedules=[{id:1,class:'KELAS 7-1',subject:'B. JERMAN',start:'05:30',end:'06:30',column:'left'},{id:2,class:'KELAS 7-2',subject:'B. ARAB',start:'05:30',end:'07:15',column:'left'},{id:3,class:'KELAS 7-3',subject:'TAHSIN',start:'06:30',end:'07:30',column:'left'},{id:4,class:'KELAS 7-4',subject:'MATEMATIKA',start:'07:30',end:'09:00',column:'left'},{id:5,class:'KELAS 7-5',subject:'IPA TERPADU',start:'09:00',end:'10:30',column:'left'},{id:6,class:'KELAS 8-1',subject:'B. INGGRIS',start:'05:30',end:'06:30',column:'right'},{id:7,class:'KELAS 8-3',subject:'B. TURKEY',start:'05:30',end:'07:15',column:'right'},{id:8,class:'KELAS 8-2',subject:'FIQH',start:'06:30',end:'07:30',column:'right'},{id:9,class:'KELAS 9-1',subject:'AKIDAH AKHLAK',start:'07:30',end:'09:00',column:'right'},{id:10,class:'KELAS 9-2',subject:'PKn',start:'09:00',end:'10:30',column:'right'}];
 
-function saveState(){try{const s=JSON.parse(JSON.stringify(state));if(JSON.stringify(s).length>4000000){s.wallpaper.custom=null;s.bgVideo=null;s.slideshow.media=s.slideshow.media.map(m=>{if(m&&(m.startsWith('data:')&&m.length>500000))return null;return m;});Object.keys(s.bells).forEach(k=>{if(s.bells[k].music&&s.bells[k].music.length>500000)s.bells[k].music=null;});s.alarms=s.alarms.map(a=>{if(a.music&&a.music.length>500000)a.music=null;return a;});}localStorage.setItem('pptqDisplayState',JSON.stringify(s));}catch(e){}}
-function loadState(){const saved=localStorage.getItem('pptqDisplayState');if(saved){try{Object.assign(state,JSON.parse(saved));const db={'masuk':{time:'07:00',label:'Jam Masuk Sekolah',music:null,musicName:'',enabled:true},'istirahat1':{time:'09:30',label:'Jam Istirahat 1',music:null,musicName:'',enabled:true},'ganti1':{time:'09:45',label:'Ganti Pelajaran 1',music:null,musicName:'',enabled:true},'ganti2':{time:'10:45',label:'Ganti Pelajaran 2',music:null,musicName:'',enabled:true},'istirahat2':{time:'11:30',label:'Jam Istirahat 2',music:null,musicName:'',enabled:true},'ganti3':{time:'12:30',label:'Ganti Pelajaran 3',music:null,musicName:'',enabled:true},'ganti4':{time:'13:30',label:'Ganti Pelajaran 4',music:null,musicName:'',enabled:true},'ganti5':{time:'14:30',label:'Ganti Pelajaran 5',music:null,musicName:'',enabled:true},'pulang':{time:'15:30',label:'Jam Pulang Sekolah',music:null,musicName:'',enabled:true}};if(!state.bells)state.bells=db;Object.keys(db).forEach(k=>{if(!state.bells[k])state.bells[k]=db[k];});if(!state.customColors){const t=themes[0];state.customColors={bgSolid:t.bgSolid,bgOverlay:t.bgOverlay,primary:t.primary,primaryDark:t.primaryDark,primaryLight:t.primaryLight,accent:t.accent,accent2:t.accent2,accent3:t.accent3};}if(!state.slideshow)state.slideshow={media:[],interval:8,currentIndex:0};if(state.slideshow.images&&!state.slideshow.media)state.slideshow.media=state.slideshow.images;if(!state.slideshow.media)state.slideshow.media=[];if(state.ytOverlay===undefined)state.ytOverlay=30;}catch(e){}}if(!state.schedules||state.schedules.length===0)state.schedules=defaultSchedules;}
+function saveState(){try{var s=JSON.parse(JSON.stringify(state));if(JSON.stringify(s).length>4000000){s.wallpaper.custom=null;s.bgVideo=null;s.slideshow.media=s.slideshow.media.map(function(m){if(m&&(m.startsWith('data:')&&m.length>500000))return null;return m;});Object.keys(s.bells).forEach(function(k){if(s.bells[k].music&&s.bells[k].music.length>500000)s.bells[k].music=null;});s.alarms=s.alarms.map(function(a){if(a.music&&a.music.length>500000)a.music=null;return a;});}localStorage.setItem('pptqDisplayState',JSON.stringify(s));}catch(e){}}
+function loadState(){var saved=localStorage.getItem('pptqDisplayState');if(saved){try{Object.assign(state,JSON.parse(saved));var db={'masuk':{time:'07:00',label:'Jam Masuk Sekolah',music:null,musicName:'',enabled:true},'istirahat1':{time:'09:30',label:'Jam Istirahat 1',music:null,musicName:'',enabled:true},'ganti1':{time:'09:45',label:'Ganti Pelajaran 1',music:null,musicName:'',enabled:true},'ganti2':{time:'10:45',label:'Ganti Pelajaran 2',music:null,musicName:'',enabled:true},'istirahat2':{time:'11:30',label:'Jam Istirahat 2',music:null,musicName:'',enabled:true},'ganti3':{time:'12:30',label:'Ganti Pelajaran 3',music:null,musicName:'',enabled:true},'ganti4':{time:'13:30',label:'Ganti Pelajaran 4',music:null,musicName:'',enabled:true},'ganti5':{time:'14:30',label:'Ganti Pelajaran 5',music:null,musicName:'',enabled:true},'pulang':{time:'15:30',label:'Jam Pulang Sekolah',music:null,musicName:'',enabled:true}};if(!state.bells)state.bells=db;Object.keys(db).forEach(function(k){if(!state.bells[k])state.bells[k]=db[k];});if(!state.customColors){var t=themes[0];state.customColors={bgSolid:t.bgSolid,bgOverlay:t.bgOverlay,primary:t.primary,primaryDark:t.primaryDark,primaryLight:t.primaryLight,accent:t.accent,accent2:t.accent2,accent3:t.accent3};}if(!state.slideshow)state.slideshow={media:[],interval:8,currentIndex:0};if(state.slideshow.images&&!state.slideshow.media)state.slideshow.media=state.slideshow.images;if(!state.slideshow.media)state.slideshow.media=[];if(state.ytOverlay===undefined)state.ytOverlay=30;}catch(e){}}if(!state.schedules||state.schedules.length===0)state.schedules=defaultSchedules;}
 function hexToRgb(hex){return{r:parseInt(hex.slice(1,3),16),g:parseInt(hex.slice(3,5),16),b:parseInt(hex.slice(5,7),16)};}
-function hexToRgbStr(hex){const r=hexToRgb(hex);return`${r.r}, ${r.g}, ${r.b}`;}
-function applyTheme(){const c=state.customColors,root=document.documentElement;root.style.setProperty('--bg-solid',c.bgSolid);root.style.setProperty('--primary',c.primary);root.style.setProperty('--primary-dark',c.primaryDark);root.style.setProperty('--primary-light',c.primaryLight);root.style.setProperty('--accent',c.accent);root.style.setProperty('--accent-2',c.accent2);root.style.setProperty('--accent-3',c.accent3);root.style.setProperty('--bg-solid-rgb',hexToRgbStr(c.bgSolid));root.style.setProperty('--primary-rgb',hexToRgbStr(c.primary));root.style.setProperty('--primary-dark-rgb',hexToRgbStr(c.primaryDark));root.style.setProperty('--primary-light-rgb',hexToRgbStr(c.primaryLight));root.style.setProperty('--accent-rgb',hexToRgbStr(c.accent));root.style.setProperty('--accent3-rgb',hexToRgbStr(c.accent3));const ov=hexToRgb(c.bgOverlay);root.style.setProperty('--bg-overlay',`rgba(${ov.r}, ${ov.g}, ${ov.b}, ${state.wallpaper.overlay/100})`);document.body.style.background=c.bgSolid;const p=document.querySelector('.pattern-overlay');if(p)p.style.backgroundImage=`radial-gradient(circle at 15% 25%, rgba(${hexToRgbStr(c.primary)}, 0.18) 0%, transparent 40%), radial-gradient(circle at 85% 75%, rgba(${hexToRgbStr(c.accent)}, 0.12) 0%, transparent 40%)`;const pr=document.getElementById('colorPreviewBox');if(pr){pr.style.background=`linear-gradient(135deg, ${c.primaryDark}, ${c.primary})`;pr.textContent='Preview: '+c.primary;}}
-function renderThemeGrid(){document.getElementById('themeGrid').innerHTML=themes.map(t=>`<div class="theme-card ${state.theme===t.id?'active':''}" data-id="${t.id}"><div class="theme-colors"><div class="theme-color" style="background:${t.bgSolid}"></div><div class="theme-color" style="background:${t.primary}"></div><div class="theme-color" style="background:${t.primaryLight}"></div><div class="theme-color" style="background:${t.accent}"></div></div><div class="theme-name">${t.name}</div></div>`).join('');}
-function renderColorPresets(id,colors,key){document.getElementById(id).innerHTML=colors.map(c=>`<div class="color-preset" style="background:${c}" data-color="${c}" data-key="${key}"></div>`).join('');}
-const days=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
-const months=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
-function updateClock(){const n=new Date();document.getElementById('dayDate').textContent=`${days[n.getDay()]}, ${n.getDate()} ${months[n.getMonth()]} ${n.getFullYear()}`;const h=String(n.getHours()).padStart(2,'0'),m=String(n.getMinutes()).padStart(2,'0'),s=String(n.getSeconds()).padStart(2,'0');document.getElementById('currentTime').textContent=`${h}:${m}:${s}`;document.getElementById('clockTime').textContent=`${h}:${m}`;document.getElementById('clockSeconds').textContent=s;updateActivity();checkBells();checkAlarms();}
-function timeToMinutes(t){const[h,m]=t.split(':').map(Number);return h*60+m;}
-function getCurrentSchedules(){const n=new Date(),c=n.getHours()*60+n.getMinutes();return state.schedules.filter(s=>timeToMinutes(s.start)<=c&&timeToMinutes(s.end)>c);}
-function getNextSchedules(){const n=new Date(),c=n.getHours()*60+n.getMinutes();return state.schedules.filter(s=>timeToMinutes(s.start)>c).sort((a,b)=>timeToMinutes(a.start)-timeToMinutes(b.start));}
-function updateActivity(){const cur=getCurrentSchedules(),nxt=getNextSchedules();if(cur.length>0){const f=cur[0];document.getElementById('currentActivityLabel').textContent=`${f.class} - ${f.subject}`;document.getElementById('activityTimeLabel').textContent=`${f.start} - ${f.end}`;const n=new Date(),cm=n.getHours()*60+n.getMinutes()+n.getSeconds()/60,sm=timeToMinutes(f.start),em=timeToMinutes(f.end);document.getElementById('progressBar').style.width=Math.min(100,Math.max(0,((cm-sm)/(em-sm))*100))+'%';}else{document.getElementById('currentActivityLabel').textContent='Tidak Ada Kegiatan';document.getElementById('activityTimeLabel').textContent='--:-- - --:--';document.getElementById('progressBar').style.width='0%';}renderScheduleLists();}
-function renderScheduleLists(){const cur=getCurrentSchedules(),nxt=getNextSchedules();const cIds=cur.map(s=>s.id),nFirst=nxt.length>0?nxt[0].id:-1;const left=state.schedules.filter(s=>s.column==='left').sort((a,b)=>timeToMinutes(a.start)-timeToMinutes(b.start));const right=state.schedules.filter(s=>s.column==='right').sort((a,b)=>timeToMinutes(a.start)-timeToMinutes(b.start));const render=(arr)=>arr.length===0?'<p style="text-align:center;color:rgba(255,255,255,0.5);padding:20px;font-size:0.85rem;">Tidak ada jadwal</p>':arr.map(s=>{let cls='',b='';if(cIds.includes(s.id)){cls='active';b='<span class="badge">SEDANG BERLANGSUNG</span>';}else if(s.id===nFirst){cls='next';b='<span class="badge">BERIKUTNYA</span>';}return`<div class="schedule-card ${cls}"><div class="class-name"><span>${s.class}</span>${b}</div><div class="class-time"><i class="far fa-clock"></i> ${s.start} - ${s.end}</div><div class="class-subject"><i class="fas fa-book"></i> ${s.subject}</div></div>`;}).join('');document.getElementById('scheduleListLeft').innerHTML=render(left);document.getElementById('scheduleListRight').innerHTML=render(right);}
+function hexToRgbStr(hex){var r=hexToRgb(hex);return r.r+', '+r.g+', '+r.b;}
+function applyTheme(){var c=state.customColors,root=document.documentElement;root.style.setProperty('--bg-solid',c.bgSolid);root.style.setProperty('--primary',c.primary);root.style.setProperty('--primary-dark',c.primaryDark);root.style.setProperty('--primary-light',c.primaryLight);root.style.setProperty('--accent',c.accent);root.style.setProperty('--accent-2',c.accent2);root.style.setProperty('--accent-3',c.accent3);root.style.setProperty('--bg-solid-rgb',hexToRgbStr(c.bgSolid));root.style.setProperty('--primary-rgb',hexToRgbStr(c.primary));root.style.setProperty('--primary-dark-rgb',hexToRgbStr(c.primaryDark));root.style.setProperty('--primary-light-rgb',hexToRgbStr(c.primaryLight));root.style.setProperty('--accent-rgb',hexToRgbStr(c.accent));root.style.setProperty('--accent3-rgb',hexToRgbStr(c.accent3));var ov=hexToRgb(c.bgOverlay);root.style.setProperty('--bg-overlay','rgba('+ov.r+', '+ov.g+', '+ov.b+', '+(state.wallpaper.overlay/100)+')');document.body.style.background=c.bgSolid;var p=document.querySelector('.pattern-overlay');if(p)p.style.backgroundImage='radial-gradient(circle at 15% 25%, rgba('+hexToRgbStr(c.primary)+', 0.18) 0%, transparent 40%), radial-gradient(circle at 85% 75%, rgba('+hexToRgbStr(c.accent)+', 0.12) 0%, transparent 40%)';var pr=document.getElementById('colorPreviewBox');if(pr){pr.style.background='linear-gradient(135deg, '+c.primaryDark+', '+c.primary+')';pr.textContent='Preview: '+c.primary;}}
+function renderThemeGrid(){document.getElementById('themeGrid').innerHTML=themes.map(function(t){return'<div class="theme-card '+(state.theme===t.id?'active':'')+'" data-id="'+t.id+'"><div class="theme-colors"><div class="theme-color" style="background:'+t.bgSolid+'"></div><div class="theme-color" style="background:'+t.primary+'"></div><div class="theme-color" style="background:'+t.primaryLight+'"></div><div class="theme-color" style="background:'+t.accent+'"></div></div><div class="theme-name">'+t.name+'</div></div>';}).join('');}
+function renderColorPresets(id,colors,key){document.getElementById(id).innerHTML=colors.map(function(c){return'<div class="color-preset" style="background:'+c+'" data-color="'+c+'" data-key="'+key+'"></div>';}).join('');}
+var days=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+var months=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+function updateClock(){var n=new Date();document.getElementById('dayDate').textContent=days[n.getDay()]+', '+n.getDate()+' '+months[n.getMonth()]+' '+n.getFullYear();var h=String(n.getHours()).padStart(2,'0'),m=String(n.getMinutes()).padStart(2,'0'),s=String(n.getSeconds()).padStart(2,'0');document.getElementById('currentTime').textContent=h+':'+m+':'+s;document.getElementById('clockTime').textContent=h+':'+m;document.getElementById('clockSeconds').textContent=s;updateActivity();checkBells();checkAlarms();}
+function timeToMinutes(t){var p=t.split(':');return parseInt(p[0])*60+parseInt(p[1]);}
+function getCurrentSchedules(){var n=new Date(),c=n.getHours()*60+n.getMinutes();return state.schedules.filter(function(s){return timeToMinutes(s.start)<=c&&timeToMinutes(s.end)>c;});}
+function getNextSchedules(){var n=new Date(),c=n.getHours()*60+n.getMinutes();return state.schedules.filter(function(s){return timeToMinutes(s.start)>c;}).sort(function(a,b){return timeToMinutes(a.start)-timeToMinutes(b.start);});}
+function updateActivity(){var cur=getCurrentSchedules(),nxt=getNextSchedules();if(cur.length>0){var f=cur[0];document.getElementById('currentActivityLabel').textContent=f.class+' - '+f.subject;document.getElementById('activityTimeLabel').textContent=f.start+' - '+f.end;var n=new Date(),cm=n.getHours()*60+n.getMinutes()+n.getSeconds()/60,sm=timeToMinutes(f.start),em=timeToMinutes(f.end);document.getElementById('progressBar').style.width=Math.min(100,Math.max(0,((cm-sm)/(em-sm))*100))+'%';}else{document.getElementById('currentActivityLabel').textContent='Tidak Ada Kegiatan';document.getElementById('activityTimeLabel').textContent='--:-- - --:--';document.getElementById('progressBar').style.width='0%';}renderScheduleLists();}
+function renderScheduleLists(){var cur=getCurrentSchedules(),nxt=getNextSchedules();var cIds=cur.map(function(s){return s.id;}),nFirst=nxt.length>0?nxt[0].id:-1;var left=state.schedules.filter(function(s){return s.column==='left';}).sort(function(a,b){return timeToMinutes(a.start)-timeToMinutes(b.start);});var right=state.schedules.filter(function(s){return s.column==='right';}).sort(function(a,b){return timeToMinutes(a.start)-timeToMinutes(b.start);});function render(arr){if(arr.length===0)return'<p style="text-align:center;color:rgba(255,255,255,0.5);padding:20px;font-size:0.85rem;">Tidak ada jadwal</p>';return arr.map(function(s){var cls='',b='';if(cIds.indexOf(s.id)>=0){cls='active';b='<span class="badge">SEDANG BERLANGSUNG</span>';}else if(s.id===nFirst){cls='next';b='<span class="badge">BERIKUTNYA</span>';}return'<div class="schedule-card '+cls+'"><div class="class-name"><span>'+s.class+'</span>'+b+'</div><div class="class-time"><i class="far fa-clock"></i> '+s.start+' - '+s.end+'</div><div class="class-subject"><i class="fas fa-book"></i> '+s.subject+'</div></div>';}).join('');}document.getElementById('scheduleListLeft').innerHTML=render(left);document.getElementById('scheduleListRight').innerHTML=render(right);}
 
 var audioUnlocked=false,unlockedAudioCtx=null;
 function unlockAudio(){if(audioUnlocked)return;try{unlockedAudioCtx=new(window.AudioContext||window.webkitAudioContext)();if(unlockedAudioCtx.state==='suspended')unlockedAudioCtx.resume();var osc=unlockedAudioCtx.createOscillator();var gain=unlockedAudioCtx.createGain();osc.connect(gain);gain.connect(unlockedAudioCtx.destination);gain.gain.value=0;osc.frequency.value=880;osc.start();osc.stop(unlockedAudioCtx.currentTime+0.01);}catch(e){}try{var silent=new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYQAAACABAAZGF0YQAAAAA=');silent.volume=0.01;silent.play().then(function(){audioUnlocked=true;}).catch(function(){audioUnlocked=true;});}catch(e){audioUnlocked=true;}document.getElementById('audio-unlock').classList.remove('show');showToast('Suara sudah aktif!','success');}
 
 var alarmAudio=null,beepCtx=null,beepInterval=null,beepCount=0;
-const MAX_BEEPS=10;
-function checkBells(){const n=new Date(),t=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;if(n.getSeconds()!==0)return;Object.keys(state.bells).forEach(k=>{const b=state.bells[k];if(b.enabled&&b.time===t&&!state.bellTriggered[k]){triggerBell(k,b);state.bellTriggered[k]=true;setTimeout(()=>state.bellTriggered[k]=false,65000);}});}
+var MAX_BEEPS=10;
+function checkBells(){var n=new Date(),t=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');if(n.getSeconds()!==0)return;Object.keys(state.bells).forEach(function(k){var b=state.bells[k];if(b.enabled&&b.time===t&&!state.bellTriggered[k]){triggerBell(k,b);state.bellTriggered[k]=true;setTimeout(function(){state.bellTriggered[k]=false;},65000);}});}
 function triggerBell(key,bell){stopAlarmAudio();document.body.classList.add('bell-active');document.getElementById('alarmModalTitle').textContent=bell.label;document.getElementById('alarmModalLabel').textContent='Pukul '+bell.time;document.getElementById('alarmModal').classList.add('show');if(bell.music){alarmAudio=new Audio(bell.music);alarmAudio.volume=state.volume/100;alarmAudio.loop=false;alarmAudio.addEventListener('ended',function(){stopAlarm();});alarmAudio.addEventListener('error',function(){stopAlarm();});alarmAudio.play().catch(function(){startBeepAlarm();});}else{startBeepAlarm();}}
-function renderBellSlots(){const icons={'masuk':'fa-door-open','istirahat1':'fa-coffee','ganti1':'fa-exchange-alt','ganti2':'fa-exchange-alt','istirahat2':'fa-utensils','ganti3':'fa-exchange-alt','ganti4':'fa-exchange-alt','ganti5':'fa-exchange-alt','pulang':'fa-door-closed'};document.getElementById('bellSlots').innerHTML=Object.keys(state.bells).map(key=>{const b=state.bells[key];return`<div class="bell-slot" data-key="${key}"><div class="bell-header"><div class="bell-name"><i class="fas ${icons[key]||'fa-bell'}"></i> ${b.label}</div><div class="toggle-switch ${b.enabled?'active':''}" data-bell-key="${key}" data-action="bell-toggle"></div></div><div class="bell-content"><input type="time" value="${b.time}" data-bell-key="${key}" data-action="bell-time"><div class="bell-file-upload"><input type="file" accept="audio/*" data-bell-key="${key}" data-action="bell-music"><button class="bell-file-btn" type="button"><i class="fas fa-music"></i> ${b.musicName||'Pilih MP3'}</button></div></div><div class="bell-actions"><span class="file-name">${b.musicName||'Beep 10x'}</span><button class="icon-btn" data-bell-key="${key}" data-action="bell-test"><i class="fas fa-play"></i></button><button class="icon-btn" data-bell-key="${key}" data-action="bell-clear" style="color:var(--danger);"><i class="fas fa-times"></i></button></div></div>`;}).join('');}
-function checkAlarms(){const n=new Date(),t=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;if(n.getSeconds()!==0)return;state.alarms.forEach(a=>{if(a.enabled&&a.time===t&&!a.triggered){triggerAlarm(a);a.triggered=true;setTimeout(()=>a.triggered=false,65000);}});}
+function renderBellSlots(){var icons={'masuk':'fa-door-open','istirahat1':'fa-coffee','ganti1':'fa-exchange-alt','ganti2':'fa-exchange-alt','istirahat2':'fa-utensils','ganti3':'fa-exchange-alt','ganti4':'fa-exchange-alt','ganti5':'fa-exchange-alt','pulang':'fa-door-closed'};document.getElementById('bellSlots').innerHTML=Object.keys(state.bells).map(function(key){var b=state.bells[key];return'<div class="bell-slot" data-key="'+key+'"><div class="bell-header"><div class="bell-name"><i class="fas '+(icons[key]||'fa-bell')+'"></i> '+b.label+'</div><div class="toggle-switch '+(b.enabled?'active':'')+'" data-bell-key="'+key+'" data-action="bell-toggle"></div></div><div class="bell-content"><input type="time" value="'+b.time+'" data-bell-key="'+key+'" data-action="bell-time"><div class="bell-file-upload"><input type="file" accept="audio/*" data-bell-key="'+key+'" data-action="bell-music"><button class="bell-file-btn" type="button"><i class="fas fa-music"></i> '+(b.musicName||'Pilih MP3')+'</button></div></div><div class="bell-actions"><span class="file-name">'+(b.musicName||'Beep 10x')+'</span><button class="icon-btn" data-bell-key="'+key+'" data-action="bell-test"><i class="fas fa-play"></i></button><button class="icon-btn" data-bell-key="'+key+'" data-action="bell-clear" style="color:var(--danger);"><i class="fas fa-times"></i></button></div></div>';}).join('');}
+function checkAlarms(){var n=new Date(),t=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');if(n.getSeconds()!==0)return;state.alarms.forEach(function(a){if(a.enabled&&a.time===t&&!a.triggered){triggerAlarm(a);a.triggered=true;setTimeout(function(){a.triggered=false;},65000);}});}
 function triggerAlarm(a){stopAlarmAudio();document.body.classList.add('bell-active');document.getElementById('alarmModalTitle').textContent=a.label||'Alarm!';document.getElementById('alarmModalLabel').textContent='Pukul '+a.time;document.getElementById('alarmModal').classList.add('show');if(a.music){alarmAudio=new Audio(a.music);alarmAudio.volume=state.volume/100;alarmAudio.loop=false;alarmAudio.addEventListener('ended',function(){stopAlarm();});alarmAudio.addEventListener('error',function(){stopAlarm();});alarmAudio.play().catch(function(){startBeepAlarm();});}else{startBeepAlarm();}}
-function startBeepAlarm(){beepCount=0;var ctx=unlockedAudioCtx;if(!ctx){try{ctx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){return;}}if(ctx.state==='suspended'){ctx.resume();}beepCtx=ctx;var vol=state.volume/100;var playBeep=function(){if(beepCount>=MAX_BEEPS){stopAlarm();return;}beepCount++;try{var osc=ctx.createOscillator();var gain=ctx.createGain();osc.connect(gain);gain.connect(ctx.destination);osc.frequency.value=880;osc.type='sine';gain.gain.setValueAtTime(vol,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.5);osc.start();osc.stop(ctx.currentTime+0.5);}catch(e){}};playBeep();beepInterval=setInterval(playBeep,1000);}
+function startBeepAlarm(){beepCount=0;var ctx=unlockedAudioCtx;if(!ctx){try{ctx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){return;}}if(ctx.state==='suspended'){ctx.resume();}beepCtx=ctx;var vol=state.volume/100;function playBeep(){if(beepCount>=MAX_BEEPS){stopAlarm();return;}beepCount++;try{var osc=ctx.createOscillator();var gain=ctx.createGain();osc.connect(gain);gain.connect(ctx.destination);osc.frequency.value=880;osc.type='sine';gain.gain.setValueAtTime(vol,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.5);osc.start();osc.stop(ctx.currentTime+0.5);}catch(e){}}playBeep();beepInterval=setInterval(playBeep,1000);}
 function stopAlarmAudio(){if(alarmAudio){try{alarmAudio.pause();alarmAudio.currentTime=0;}catch(e){}alarmAudio=null;}if(beepInterval){clearInterval(beepInterval);beepInterval=null;}beepCount=0;}
 function stopAlarm(){stopAlarmAudio();document.body.classList.remove('bell-active');document.getElementById('alarmModal').classList.remove('show');}
-function updateAlarmList(){const list=document.getElementById('alarmList');list.innerHTML=state.alarms.length===0?'<p style="text-align:center;color:var(--text-muted);padding:20px;">Belum ada alarm</p>':state.alarms.map(a=>`<div class="alarm-item"><div class="alarm-info"><div class="alarm-time">${a.time}</div><div class="alarm-details">${a.label||'Alarm'} ${a.musicName?'• '+a.musicName:'• Beep 10x'}</div></div><div class="alarm-actions"><div class="toggle-switch ${a.enabled?'active':''}" data-id="${a.id}" data-action="toggle"></div><button class="icon-btn" data-id="${a.id}" data-action="test"><i class="fas fa-play"></i></button><button class="icon-btn" data-id="${a.id}" data-action="delete" style="color:var(--danger);"><i class="fas fa-trash"></i></button></div></div>`).join('');}
-function parseYouTubeUrl(url){if(!url)return null;const patterns=[/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/];for(const p of patterns){const m=url.match(p);if(m)return m[1];}return null;}
-function applyYtOverlay(){const overlay=document.getElementById('youtube-overlay');const c=state.customColors;const rgb=hexToRgb(c.bgSolid);overlay.style.background=`rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${state.ytOverlay/100})`;}
-function applyBackground(){var wpLayer=document.getElementById('wallpaper-layer'),wpVideo=document.getElementById('wallpaper-video'),ytBg=document.getElementById('youtube-bg'),ytIframe=document.getElementById('youtube-iframe');if(state.youtubeUrl){var vid=parseYouTubeUrl(state.youtubeUrl);if(vid){ytIframe.src='https://www.youtube.com/embed/'+vid+'?autoplay=1&mute=1&loop=1&playlist='+vid+'&controls=0&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1&enablejsapi=1';ytBg.classList.add('active');wpLayer.style.display='none';wpVideo.classList.remove('active');wpVideo.pause();applyYtOverlay();return;}}ytBg.classList.remove('active');ytIframe.src='';if(state.bgVideo){wpVideo.src=state.bgVideo;wpVideo.classList.add('active');wpVideo.play().catch(()=>{});wpLayer.style.display='none';return;}wpVideo.classList.remove('active');wpVideo.pause();wpVideo.removeAttribute('src');wpLayer.style.display='block';applyTheme();if(state.wallpaper.type==='preset'){var preset=presetWallpapers.find(w=>w.id===state.wallpaper.value);if(preset){if(preset.type==='gradient'){wpLayer.style.background=preset.url;wpLayer.style.backgroundImage='none';}else{wpLayer.style.background='url("'+preset.url+'") center/cover no-repeat';}}}else if(state.wallpaper.type==='url'){wpLayer.style.background='url("'+state.wallpaper.value+'") center/cover no-repeat';}else if(state.wallpaper.type==='custom'&&state.wallpaper.custom){wpLayer.style.background='url("'+state.wallpaper.custom+'") center/cover no-repeat';}}
-function renderWallpaperGrid(){document.getElementById('wallpaperGrid').innerHTML=presetWallpapers.map(w=>`<div class="wallpaper-item ${state.wallpaper.type==='preset'&&state.wallpaper.value===w.id?'active':''}" data-id="${w.id}">${w.type==='gradient'?`<div class="gradient-preview" style="background:${w.url};"></div>`:`<img src="${w.url}" alt="${w.name}" loading="lazy">`}<div class="check"><i class="fas fa-check"></i></div></div>`).join('');}
+function updateAlarmList(){var list=document.getElementById('alarmList');list.innerHTML=state.alarms.length===0?'<p style="text-align:center;color:var(--text-muted);padding:20px;">Belum ada alarm</p>':state.alarms.map(function(a){return'<div class="alarm-item"><div class="alarm-info"><div class="alarm-time">'+a.time+'</div><div class="alarm-details">'+(a.label||'Alarm')+' '+(a.musicName?'• '+a.musicName:'• Beep 10x')+'</div></div><div class="alarm-actions"><div class="toggle-switch '+(a.enabled?'active':'')+'" data-id="'+a.id+'" data-action="toggle"></div><button class="icon-btn" data-id="'+a.id+'" data-action="test"><i class="fas fa-play"></i></button><button class="icon-btn" data-id="'+a.id+'" data-action="delete" style="color:var(--danger);"><i class="fas fa-trash"></i></button></div></div>';}).join('');}
+function parseYouTubeUrl(url){if(!url)return null;var patterns=[/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/];for(var i=0;i<patterns.length;i++){var m=url.match(patterns[i]);if(m)return m[1];}return null;}
+function applyYtOverlay(){var overlay=document.getElementById('youtube-overlay');var c=state.customColors;var rgb=hexToRgb(c.bgSolid);overlay.style.background='rgba('+rgb.r+', '+rgb.g+', '+rgb.b+', '+(state.ytOverlay/100)+')';}
+function applyBackground(){var wpLayer=document.getElementById('wallpaper-layer'),wpVideo=document.getElementById('wallpaper-video'),ytBg=document.getElementById('youtube-bg'),ytIframe=document.getElementById('youtube-iframe');if(state.youtubeUrl){var vid=parseYouTubeUrl(state.youtubeUrl);if(vid){ytIframe.src='https://www.youtube.com/embed/'+vid+'?autoplay=1&mute=1&loop=1&playlist='+vid+'&controls=0&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1&enablejsapi=1';ytBg.classList.add('active');wpLayer.style.display='none';wpVideo.classList.remove('active');wpVideo.pause();applyYtOverlay();return;}}ytBg.classList.remove('active');ytIframe.src='';if(state.bgVideo){wpVideo.src=state.bgVideo;wpVideo.classList.add('active');wpVideo.play().catch(function(){});wpLayer.style.display='none';return;}wpVideo.classList.remove('active');wpVideo.pause();wpVideo.removeAttribute('src');wpLayer.style.display='block';applyTheme();if(state.wallpaper.type==='preset'){var preset=presetWallpapers.find(function(w){return w.id===state.wallpaper.value;});if(preset){if(preset.type==='gradient'){wpLayer.style.background=preset.url;wpLayer.style.backgroundImage='none';}else{wpLayer.style.background='url("'+preset.url+'") center/cover no-repeat';}}}else if(state.wallpaper.type==='url'){wpLayer.style.background='url("'+state.wallpaper.value+'") center/cover no-repeat';}else if(state.wallpaper.type==='custom'&&state.wallpaper.custom){wpLayer.style.background='url("'+state.wallpaper.custom+'") center/cover no-repeat';}}
+function renderWallpaperGrid(){document.getElementById('wallpaperGrid').innerHTML=presetWallpapers.map(function(w){return'<div class="wallpaper-item '+(state.wallpaper.type==='preset'&&state.wallpaper.value===w.id?'active':'')+'" data-id="'+w.id+'">'+(w.type==='gradient'?'<div class="gradient-preview" style="background:'+w.url+';"></div>':'<img src="'+w.url+'" alt="'+w.name+'" loading="lazy">')+'<div class="check"><i class="fas fa-check"></i></div></div>';}).join('');}
 var slideshowInterval=null;
 function isVideoMedia(d){return d&&d.startsWith('data:video');}
 function isYouTubeMedia(d){return d&&d.startsWith('yt:');}
 function getYouTubeId(d){return d.substring(3);}
-function renderBuildingSlides(){var c=document.getElementById('buildingImage'),ind=document.getElementById('slideIndicators');c.querySelectorAll('.slide, .slide-video, .slide-yt').forEach(s=>s.remove());var media=state.slideshow.media.filter(Boolean);if(media.length===0){var s=document.createElement('div');s.className='slide active';s.style.backgroundImage='url("https://images.unsplash.com/photo-1562774053-701439336967?w=1200")';c.insertBefore(s,c.firstChild);ind.innerHTML='';}else{media.forEach(function(item,idx){var isActive=idx===state.slideshow.currentIndex;var slide;if(isYouTubeMedia(item)){var vid=getYouTubeId(item);slide=document.createElement('iframe');slide.className='slide-yt'+(isActive?' active':'');slide.src='https://www.youtube.com/embed/'+vid+'?autoplay=1&mute=1&loop=1&playlist='+vid+'&controls=0&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1&enablejsapi=1';slide.allow='autoplay; fullscreen; encrypted-media';slide.setAttribute('allowfullscreen','');}else if(isVideoMedia(item)){slide=document.createElement('video');slide.className='slide-video'+(isActive?' active':'');slide.src=item;slide.muted=true;slide.loop=true;slide.playsInline=true;slide.autoplay=true;if(isActive)slide.play().catch(()=>{});}else{slide=document.createElement('div');slide.className='slide'+(isActive?' active':'');slide.style.backgroundImage='url("'+item+'")';}c.insertBefore(slide,c.firstChild);});ind.innerHTML=media.map(function(_,idx){return'<div class="slide-indicator '+(idx===state.slideshow.currentIndex?'active':'')+'"></div>';}).join('');}}
-function startSlideshow(){if(slideshowInterval)clearInterval(slideshowInterval);var media=state.slideshow.media.filter(Boolean);if(media.length<=1)return;slideshowInterval=setInterval(function(){var imgs=state.slideshow.media.filter(Boolean);if(imgs.length<=1)return;state.slideshow.currentIndex=(state.slideshow.currentIndex+1)%imgs.length;document.querySelectorAll('#buildingImage .slide, #buildingImage .slide-video, #buildingImage .slide-yt').forEach(function(s,idx){var a=idx===state.slideshow.currentIndex;s.classList.toggle('active',a);if(s.tagName==='VIDEO'){if(a)s.play().catch(()=>{});else s.pause();}});document.querySelectorAll('#slideIndicators .slide-indicator').forEach(function(ind,idx){ind.classList.toggle('active',idx===state.slideshow.currentIndex);});},state.slideshow.interval*1000);}
+function renderBuildingSlides(){var c=document.getElementById('buildingImage'),ind=document.getElementById('slideIndicators');c.querySelectorAll('.slide, .slide-video, .slide-yt').forEach(function(s){s.remove();});var media=state.slideshow.media.filter(Boolean);if(media.length===0){var s=document.createElement('div');s.className='slide active';s.style.backgroundImage='url("https://images.unsplash.com/photo-1562774053-701439336967?w=1200")';c.insertBefore(s,c.firstChild);ind.innerHTML='';}else{media.forEach(function(item,idx){var isActive=idx===state.slideshow.currentIndex;var slide;if(isYouTubeMedia(item)){var vid=getYouTubeId(item);slide=document.createElement('iframe');slide.className='slide-yt'+(isActive?' active':'');slide.src='https://www.youtube.com/embed/'+vid+'?autoplay=1&mute=1&loop=1&playlist='+vid+'&controls=0&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1&enablejsapi=1';slide.allow='autoplay; fullscreen; encrypted-media';slide.setAttribute('allowfullscreen','');}else if(isVideoMedia(item)){slide=document.createElement('video');slide.className='slide-video'+(isActive?' active':'');slide.src=item;slide.muted=true;slide.loop=true;slide.playsInline=true;slide.autoplay=true;if(isActive)slide.play().catch(function(){});}else{slide=document.createElement('div');slide.className='slide'+(isActive?' active':'');slide.style.backgroundImage='url("'+item+'")';}c.insertBefore(slide,c.firstChild);});ind.innerHTML=media.map(function(_,idx){return'<div class="slide-indicator '+(idx===state.slideshow.currentIndex?'active':'')+'"></div>';}).join('');}}
+function startSlideshow(){if(slideshowInterval)clearInterval(slideshowInterval);var media=state.slideshow.media.filter(Boolean);if(media.length<=1)return;slideshowInterval=setInterval(function(){var imgs=state.slideshow.media.filter(Boolean);if(imgs.length<=1)return;state.slideshow.currentIndex=(state.slideshow.currentIndex+1)%imgs.length;document.querySelectorAll('#buildingImage .slide, #buildingImage .slide-video, #buildingImage .slide-yt').forEach(function(s,idx){var a=idx===state.slideshow.currentIndex;s.classList.toggle('active',a);if(s.tagName==='VIDEO'){if(a)s.play().catch(function(){});else s.pause();}});document.querySelectorAll('#slideIndicators .slide-indicator').forEach(function(ind,idx){ind.classList.toggle('active',idx===state.slideshow.currentIndex);});},state.slideshow.interval*1000);}
 function renderSlideshowGrid(){var grid=document.getElementById('slideshowGrid');var slots=[];for(var i=0;i<3;i++){var item=state.slideshow.media[i];var content;if(item){if(isYouTubeMedia(item)){content='<div class="yt-preview"><i class="fab fa-youtube"></i></div><button class="remove-btn" data-remove="'+i+'"><i class="fas fa-times"></i></button><div class="media-badge"><i class="fab fa-youtube" style="color:#ff0000;"></i> YouTube</div>';}else if(isVideoMedia(item)){content='<video src="'+item+'" muted preload="metadata"></video><button class="remove-btn" data-remove="'+i+'"><i class="fas fa-times"></i></button><div class="media-badge"><i class="fas fa-video"></i> Video</div>';}else{content='<img src="'+item+'" alt="Slide '+(i+1)+'"><button class="remove-btn" data-remove="'+i+'"><i class="fas fa-times"></i></button><div class="media-badge"><i class="fas fa-image"></i> Foto</div>';}}else{content='<div class="slot-content"><i class="fas fa-plus"></i><p>Foto/Video '+(i+1)+'</p></div>';}slots.push('<div class="slide-slot" data-slot="'+i+'">'+content+'<input type="file" accept="image/*,video/*" data-slot="'+i+'" style="display:none;"></div>');}grid.innerHTML=slots.join('');grid.querySelectorAll('.slide-slot').forEach(function(slot){var fi=slot.querySelector('input[type="file"]');slot.addEventListener('click',function(e){if(!e.target.closest('.remove-btn'))fi.click();});fi.addEventListener('change',function(e){var f=e.target.files[0];if(!f)return;var isVid=f.type.startsWith('video/');var max=isVid?20*1024*1024:5*1024*1024;if(f.size>max){showToast('File terlalu besar (max '+(isVid?'20MB':'5MB')+')','error');return;}var idx=parseInt(fi.dataset.slot);var r=new FileReader();r.onload=function(ev){if(!state.slideshow.media)state.slideshow.media=[];state.slideshow.media[idx]=ev.target.result;renderSlideshowGrid();renderBuildingSlides();startSlideshow();saveState();showToast(isVid?'Video ditambahkan':'Foto ditambahkan','success');};r.readAsDataURL(f);});});grid.querySelectorAll('.remove-btn').forEach(function(btn){btn.addEventListener('click',function(e){e.stopPropagation();var idx=parseInt(btn.dataset.remove);state.slideshow.media[idx]=null;state.slideshow.media=state.slideshow.media.filter(Boolean);state.slideshow.currentIndex=0;renderSlideshowGrid();renderBuildingSlides();startSlideshow();saveState();showToast('Media dihapus','info');});});}
-document.getElementById('addYtSlide').addEventListener('click',function(){var url=document.getElementById('ytSlideUrl').value.trim();var slot=parseInt(document.getElementById('ytSlotSelect').value);if(!url){showToast('Masukkan URL YouTube','error');return;}var vid=parseYouTubeUrl(url);if(!vid){showToast('URL YouTube tidak valid','error');return;}if(!state.slideshow.media)state.slideshow.media=[];state.slideshow.media[slot]='yt:'+vid;document.getElementById('ytSlideUrl').value='';renderSlideshowGrid();renderBuildingSlides();startSlideshow();saveState();showToast('YouTube ditambahkan ke slot '+(slot+1),'success');});
 function createParticles(){var c=document.getElementById('particles');c.innerHTML='';for(var i=0;i<15;i++){var p=document.createElement('div');p.className='particle';var sz=Math.random()*4+2;p.style.width=sz+'px';p.style.height=sz+'px';p.style.left=Math.random()*100+'%';p.style.animationDuration=(Math.random()*20+15)+'s';p.style.animationDelay=Math.random()*20+'s';p.style.opacity=Math.random()*0.4+0.15;c.appendChild(p);}}
 function showToast(msg,type){type=type||'info';var t=document.getElementById('toast'),ic=t.querySelector('i');t.className='toast '+type;ic.className=type==='success'?'fas fa-check-circle':type==='error'?'fas fa-exclamation-circle':'fas fa-info-circle';document.getElementById('toastMessage').textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},3000);}
+
+// PANGGIL SISWA + TTS
+var callCountdownTimer=null,callSoundInterval=null,availableVoices=[];
+function loadVoices(){if(window.speechSynthesis){availableVoices=window.speechSynthesis.getVoices();}}
+if(window.speechSynthesis){loadVoices();window.speechSynthesis.onvoiceschanged=loadVoices;}
+function openCallModal(){document.getElementById('callModal').classList.add('show');}
+function closeCallModal(){document.getElementById('callModal').classList.remove('show');}
+function addCallNameRow(){var div=document.createElement('div');div.className='call-name-row';div.innerHTML='<input type="text" class="form-control call-name-input" placeholder="Nama siswa..."><button class="remove-row"><i class="fas fa-times"></i></button>';div.querySelector('.remove-row').addEventListener('click',function(){div.remove();});document.getElementById('callNamesList').appendChild(div);}
+function playCallBeep(){try{var ctx=unlockedAudioCtx;if(!ctx){ctx=new(window.AudioContext||window.webkitAudioContext)();unlockedAudioCtx=ctx;}if(ctx.state==='suspended')ctx.resume();var vol=state.volume/100;if(vol===0)vol=0.8;for(var i=0;i<2;i++){(function(idx){setTimeout(function(){try{var osc=ctx.createOscillator();var gain=ctx.createGain();osc.connect(gain);gain.connect(ctx.destination);osc.frequency.value=idx===0?880:1100;osc.type='sine';gain.gain.setValueAtTime(vol,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.3);osc.start();osc.stop(ctx.currentTime+0.3);}catch(e){}},idx*350);})(i);}}catch(e){}}
+function speakCall(names,message,repeat){if(!window.speechSynthesis){showToast('Browser tidak mendukung TTS','error');return;}var text='';if(names.length===1){text=names[0];}else if(names.length===2){text=names[0]+' dan '+names[1];}else{text=names.slice(0,-1).join(', ')+', dan '+names[names.length-1];}if(message){text+='. '+message;}else{text+=', silakan ke ruang guru';}window.speechSynthesis.cancel();var idVoice=availableVoices.find(function(v){return v.lang==='id-ID'||v.lang==='id_ID'||(v.lang&&v.lang.startsWith('id'));});var currentRepeat=0;function speakOnce(){if(currentRepeat>=repeat)return;currentRepeat++;var u=new SpeechSynthesisUtterance(text);u.lang='id-ID';u.rate=0.85;u.pitch=1.0;u.volume=state.volume/100;if(idVoice)u.voice=idVoice;u.onend=function(){if(currentRepeat<repeat){setTimeout(speakOnce,2000);}};u.onerror=function(){playCallBeep();};window.speechSynthesis.speak(u);}playCallBeep();setTimeout(function(){speakOnce();},800);}
+function executeCall(){var inputs=document.querySelectorAll('.call-name-input');var names=[];inputs.forEach(function(input){var v=input.value.trim();if(v)names.push(v);});if(names.length===0){showToast('Masukkan minimal 1 nama','error');return;}var msg=document.getElementById('callMessage').value.trim();var dur=parseInt(document.getElementById('callDuration').value);var voiceEnabled=document.getElementById('callVoiceEnabled').checked;var repeat=parseInt(document.getElementById('callRepeat').value);var namesHtml=names.map(function(n){return'<span class="name-item">'+n+'</span>';}).join('');document.getElementById('callDisplayNames').innerHTML=namesHtml;document.getElementById('callDisplayMessage').textContent=msg||'';document.getElementById('callDisplayMessage').style.display=msg?'block':'none';closeCallModal();document.getElementById('callDisplay').classList.add('show');if(voiceEnabled){speakCall(names,msg,repeat);}else{playCallBeep();if(callSoundInterval)clearInterval(callSoundInterval);callSoundInterval=setInterval(function(){playCallBeep();},2000);}if(dur>0){var remaining=dur;document.getElementById('callCountdown').textContent='Otomatis tutup dalam '+remaining+' detik';document.getElementById('callCountdown').style.display='block';if(callCountdownTimer)clearInterval(callCountdownTimer);callCountdownTimer=setInterval(function(){remaining--;if(remaining<=0){dismissCall();return;}document.getElementById('callCountdown').textContent='Otomatis tutup dalam '+remaining+' detik';},1000);}else{document.getElementById('callCountdown').style.display='none';}}
+function dismissCall(){document.getElementById('callDisplay').classList.remove('show');if(callSoundInterval){clearInterval(callSoundInterval);callSoundInterval=null;}if(callCountdownTimer){clearInterval(callCountdownTimer);callCountdownTimer=null;}if(window.speechSynthesis)window.speechSynthesis.cancel();}
+function testVoice(){if(!window.speechSynthesis){showToast('Browser tidak mendukung TTS','error');return;}window.speechSynthesis.cancel();var idVoice=availableVoices.find(function(v){return v.lang==='id-ID'||v.lang==='id_ID'||(v.lang&&v.lang.startsWith('id'));});var u=new SpeechSynthesisUtterance('Halo, ini adalah tes suara panggilan siswa. Contoh: Laudia, silakan ke ruang guru.');u.lang='id-ID';u.rate=0.85;u.pitch=1.0;u.volume=state.volume/100;if(idVoice)u.voice=idVoice;window.speechSynthesis.speak(u);showToast('Membaca tes suara...','info');}
+
 function openSettings(){document.getElementById('settingsOverlay').classList.add('active');document.getElementById('settingsPanel').classList.add('active');document.getElementById('setSchoolName').value=state.school.name;document.getElementById('setSchoolAddress').value=state.school.address;document.getElementById('setSchoolWebsite').value=state.school.website;document.getElementById('setSchoolLogo').value=state.school.logo;document.getElementById('setArabic').value=state.school.arabic;document.getElementById('setMotto').value=state.school.motto;document.getElementById('volumeSlider').value=state.volume;document.getElementById('volumeValue').textContent=state.volume+'%';document.getElementById('setAnnouncement1').value=state.announcements.left;document.getElementById('setAnnouncement2').value=state.announcements.right;document.getElementById('overlaySlider').value=state.wallpaper.overlay;document.getElementById('overlayValue').textContent=state.wallpaper.overlay+'%';document.getElementById('slideIntervalSlider').value=state.slideshow.interval;document.getElementById('slideIntervalValue').textContent=state.slideshow.interval+' dtk';document.getElementById('bgVideoName').textContent=state.bgVideo?'Video custom sudah diupload':'Upload video pendek (max 20MB)';document.getElementById('youtubeUrlInput').value=state.youtubeUrl||'';document.getElementById('ytOverlaySlider').value=state.ytOverlay;document.getElementById('ytOverlayValue').textContent=state.ytOverlay+'%';var c=state.customColors;['bgSolid','overlay','primary','primaryDark','primaryLight','accent','accent3'].forEach(function(k){var picker=document.getElementById(k==='overlay'?'overlayPicker':k==='bgSolid'?'bgSolidPicker':k+'Picker');var text=document.getElementById(k==='overlay'?'overlayText':k==='bgSolid'?'bgSolidText':k+'Text');if(picker&&text){picker.value=c[k];text.value=c[k];}});renderThemeGrid();renderColorPresets('bgSolidPresets',colorPresets.bgSolid,'bgSolid');renderColorPresets('primaryPresets',colorPresets.primary,'primary');renderColorPresets('accentPresets',colorPresets.accent,'accent');renderWallpaperGrid();renderSlideshowGrid();renderBellSlots();updateAlarmList();updateScheduleListSettings();applyTheme();}
 function closeSettings(){document.getElementById('settingsOverlay').classList.remove('active');document.getElementById('settingsPanel').classList.remove('active');}
 function updateScheduleListSettings(){var list=document.getElementById('scheduleListSettings');if(state.schedules.length===0){list.innerHTML='<p style="text-align:center;color:var(--text-muted);padding:20px;">Belum ada</p>';return;}list.innerHTML=[].concat(state.schedules).sort(function(a,b){return timeToMinutes(a.start)-timeToMinutes(b.start);}).map(function(s){return'<div class="alarm-item"><div class="alarm-info"><div class="alarm-time">'+s.start+' - '+s.end+'</div><div class="alarm-details">'+s.class+' • '+s.subject+' • '+(s.column==='left'?'Kiri':'Kanan')+'</div></div><div class="alarm-actions"><button class="icon-btn" data-id="'+s.id+'" data-action="delete-schedule" style="color:var(--danger);"><i class="fas fa-trash"></i></button></div></div>';}).join('');}
 function applySettings(){document.getElementById('schoolName').textContent=state.school.name;document.getElementById('schoolAddress').textContent=state.school.address;document.getElementById('schoolWebsite').textContent=state.school.website;document.getElementById('schoolLogo').textContent=state.school.logo;document.getElementById('arabicText').textContent=state.school.arabic;document.querySelector('.header-center .motto').textContent=state.school.motto;document.getElementById('footerAnnouncement1').textContent=state.announcements.left;document.getElementById('footerAnnouncement2').textContent=state.announcements.right;document.getElementById('buildingTitle').textContent=state.building.title;document.getElementById('buildingSubtitle').textContent=state.building.subtitle;}
 
-// ===== PANGGIL SISWA =====
-var callCountdownTimer=null;
-
-function openCallModal(){document.getElementById('callModal').classList.add('show');}
-function closeCallModal(){document.getElementById('callModal').classList.remove('show');}
-
-function addCallNameRow(){var div=document.createElement('div');div.className='call-name-row';div.innerHTML='<input type="text" class="form-control call-name-input" placeholder="Nama siswa..."><button class="remove-row"><i class="fas fa-times"></i></button>';div.querySelector('.remove-row').addEventListener('click',function(){div.remove();});document.getElementById('callNamesList').appendChild(div);}
-
-function executeCall(){
-  var inputs=document.querySelectorAll('.call-name-input');
-  var names=[];
-  inputs.forEach(function(input){var v=input.value.trim();if(v)names.push(v);});
-  if(names.length===0){showToast('Masukkan minimal 1 nama','error');return;}
-  var msg=document.getElementById('callMessage').value.trim();
-  var dur=parseInt(document.getElementById('callDuration').value);
-  // Tampilkan display
-  var namesHtml=names.map(function(n){return '<span class="name-item">'+n+'</span>';}).join('');
-  document.getElementById('callDisplayNames').innerHTML=namesHtml;
-  document.getElementById('callDisplayMessage').textContent=msg||'';
-  document.getElementById('callDisplayMessage').style.display=msg?'block':'none';
-  closeCallModal();
-  document.getElementById('callDisplay').classList.add('show');
-  // Countdown
-  if(dur>0){
-    var remaining=dur;
-    document.getElementById('callCountdown').textContent='Otomatis tutup dalam '+remaining+' detik';
-    document.getElementById('callCountdown').style.display='block';
-    if(callCountdownTimer)clearInterval(callCountdownTimer);
-    callCountdownTimer=setInterval(function(){
-      remaining--;
-      if(remaining<=0){dismissCall();return;}
-      document.getElementById('callCountdown').textContent='Otomatis tutup dalam '+remaining+' detik';
-    },1000);
-  }else{
-    document.getElementById('callCountdown').style.display='none';
-  }
-  // Bunyikan beep pendek untuk perhatian
-  try{
-    var ctx=unlockedAudioCtx||new(window.AudioContext||window.webkitAudioContext)();
-    if(ctx.state==='suspended')ctx.resume();
-    var vol=state.volume/100;
-    for(var i=0;i<3;i++){
-      setTimeout(function(){
-        var osc=ctx.createOscillator();var gain=ctx.createGain();
-        osc.connect(gain);gain.connect(ctx.destination);
-        osc.frequency.value=1000;osc.type='sine';
-        gain.gain.setValueAtTime(vol,ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.3);
-        osc.start();osc.stop(ctx.currentTime+0.3);
-      },i*500);
-    }
-  }catch(e){}
-}
-
-function dismissCall(){document.getElementById('callDisplay').classList.remove('show');if(callCountdownTimer){clearInterval(callCountdownTimer);callCountdownTimer=null;}}
-
+// EVENTS
 document.getElementById('callBtn').addEventListener('click',openCallModal);
 document.getElementById('cancelCall').addEventListener('click',closeCallModal);
 document.getElementById('addCallName').addEventListener('click',addCallNameRow);
 document.getElementById('executeCall').addEventListener('click',executeCall);
 document.getElementById('closeCallDisplay').addEventListener('click',dismissCall);
-
-// Settings events
+document.getElementById('testVoiceBtn').addEventListener('click',testVoice);
+document.getElementById('callVoiceEnabled').addEventListener('change',function(){var group=document.getElementById('voiceSettingsGroup');group.style.display=this.checked?'block':'none';});
 document.getElementById('openSettings').addEventListener('click',openSettings);
 document.getElementById('closeSettings').addEventListener('click',closeSettings);
 document.getElementById('settingsOverlay').addEventListener('click',closeSettings);
