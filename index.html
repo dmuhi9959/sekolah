@@ -41,8 +41,13 @@
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    transition: background-image 0.6s ease;
+    transition: opacity 0.8s ease, background-image 0.8s ease;
     z-index: 0;
+    opacity: 1;
+  }
+
+  #wallpaper-layer.fade {
+    opacity: 0;
   }
 
   #wallpaper-layer::after {
@@ -388,11 +393,17 @@
     min-height: 200px;
   }
 
-  .building-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 10s ease;
+  .building-image .slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1.5s ease;
+    background-size: cover;
+    background-position: center;
+  }
+
+  .building-image .slide.active {
+    opacity: 1;
   }
 
   .building-image::after {
@@ -401,6 +412,30 @@
     inset: 0;
     background: linear-gradient(180deg, transparent 50%, rgba(6, 24, 22, 0.9));
     pointer-events: none;
+    z-index: 2;
+  }
+
+  .slide-indicators {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    gap: 6px;
+    z-index: 3;
+  }
+
+  .slide-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.4);
+    transition: var(--transition);
+  }
+
+  .slide-indicator.active {
+    background: var(--accent);
+    width: 24px;
+    border-radius: 10px;
   }
 
   .building-caption {
@@ -409,7 +444,7 @@
     left: 0;
     right: 0;
     padding: 16px 20px;
-    z-index: 2;
+    z-index: 3;
   }
 
   .building-caption h2 {
@@ -600,7 +635,7 @@
     position: fixed;
     top: 0;
     right: 0;
-    width: 480px;
+    width: 500px;
     max-width: 90vw;
     height: 100vh;
     background: linear-gradient(135deg, #0a1f1a, #1a2e28);
@@ -659,8 +694,8 @@
 
   .settings-tabs {
     display: flex;
-    padding: 0 20px;
-    gap: 4px;
+    padding: 0 16px;
+    gap: 2px;
     border-bottom: 1px solid var(--card-border);
     background: rgba(0, 0, 0, 0.2);
     overflow-x: auto;
@@ -668,12 +703,12 @@
   }
 
   .tab-btn {
-    padding: 12px 14px;
+    padding: 12px 12px;
     background: transparent;
     border: none;
     color: var(--text-muted);
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     font-weight: 500;
     transition: var(--transition);
     border-bottom: 2px solid transparent;
@@ -791,6 +826,212 @@
   .btn-block {
     width: 100%;
     justify-content: center;
+  }
+
+  /* Theme Grid */
+  .theme-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .theme-card {
+    border-radius: 12px;
+    padding: 14px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .theme-card .theme-colors {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+
+  .theme-card .theme-color {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+  }
+
+  .theme-card .theme-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .theme-card.active {
+    border-color: var(--accent);
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .theme-card.active::after {
+    content: '✓';
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    color: var(--accent);
+    font-weight: 900;
+    font-size: 1rem;
+  }
+
+  /* Wallpaper Slideshow */
+  .slideshow-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .slide-slot {
+    aspect-ratio: 16/10;
+    border-radius: 10px;
+    border: 2px dashed var(--card-border);
+    background: rgba(255, 255, 255, 0.03);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+  }
+
+  .slide-slot:hover {
+    border-color: var(--accent);
+    background: rgba(244, 196, 48, 0.05);
+  }
+
+  .slide-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    inset: 0;
+  }
+
+  .slide-slot .slot-content {
+    text-align: center;
+    z-index: 1;
+  }
+
+  .slide-slot .slot-content i {
+    font-size: 1.2rem;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+
+  .slide-slot .slot-content p {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+  }
+
+  .slide-slot .remove-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 22px;
+    height: 22px;
+    background: rgba(255, 82, 82, 0.9);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 0.65rem;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Bell slots */
+  .bell-slot {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+
+  .bell-slot .bell-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .bell-slot .bell-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .bell-slot .bell-name i {
+    font-size: 0.9rem;
+  }
+
+  .bell-slot .bell-content {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .bell-slot input[type="time"] {
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.95rem;
+    width: 100%;
+  }
+
+  .bell-slot .bell-actions {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-top: 8px;
+  }
+
+  .bell-slot .file-name {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .bell-file-upload {
+    position: relative;
+  }
+
+  .bell-file-upload input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .bell-file-btn {
+    padding: 6px 10px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--card-border);
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 0.75rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
   }
 
   .wallpaper-grid {
@@ -1170,8 +1411,8 @@
     </div>
 
     <div class="center-column">
-      <div class="building-image">
-        <img src="https://images.unsplash.com/photo-1562774053-701439336967?w=1200" alt="Gedung Sekolah" id="buildingImg">
+      <div class="building-image" id="buildingImage">
+        <div class="slide-indicators" id="slideIndicators"></div>
         <div class="building-caption">
           <h2 id="buildingTitle">Gedung Utama Sekolah</h2>
           <p id="buildingSubtitle">Pusat kegiatan belajar mengajar</p>
@@ -1214,7 +1455,7 @@
       <div class="footer-icon"><i class="fas fa-tshirt"></i></div>
       <div class="footer-text">
         <div class="ticker-text">
-          <strong>PENGUMUMAN:</strong> <span id="footerAnnouncement1">Seluruh siswa wajib berpakaian seragam lengkap, rapi, dan bersepatu hitam saat masuk sekolah. Toleransi maksimal 15 menit dari jam masuk.</span>
+          <strong>PENGUMUMAN:</strong> <span id="footerAnnouncement1">Seluruh siswa wajib berpakaian seragam lengkap, rapi, dan bersepatu hitam saat masuk sekolah.</span>
         </div>
       </div>
     </div>
@@ -1222,7 +1463,7 @@
       <div class="footer-icon red"><i class="fas fa-bell"></i></div>
       <div class="footer-text">
         <div class="ticker-text">
-          <strong>INFO:</strong> <span id="footerAnnouncement2">Awal pendaftaran siswa ber 57 hari lagi. Hubungi panitia penerimaan siswa baru di ruang TU. Terima kasih.</span>
+          <strong>INFO:</strong> <span id="footerAnnouncement2">Awal pendaftaran siswa ber 57 hari lagi. Hubungi panitia penerimaan siswa baru di ruang TU.</span>
         </div>
       </div>
     </div>
@@ -1244,22 +1485,26 @@
     <button class="tab-btn active" data-tab="general">
       <i class="fas fa-school"></i> Umum
     </button>
+    <button class="tab-btn" data-tab="theme">
+      <i class="fas fa-palette"></i> Tema
+    </button>
     <button class="tab-btn" data-tab="wallpaper">
       <i class="fas fa-image"></i> Wallpaper
     </button>
+    <button class="tab-btn" data-tab="bell">
+      <i class="fas fa-bell"></i> Bel Sekolah
+    </button>
     <button class="tab-btn" data-tab="alarm">
-      <i class="fas fa-bell"></i> Alarm
+      <i class="fas fa-clock"></i> Alarm Lain
     </button>
     <button class="tab-btn" data-tab="schedule">
       <i class="fas fa-calendar"></i> Jadwal
-    </button>
-    <button class="tab-btn" data-tab="image">
-      <i class="fas fa-building"></i> Gambar
     </button>
   </div>
 
   <div class="settings-body">
 
+    <!-- TAB: UMUM -->
     <div class="settings-section active" id="tab-general">
       <div class="form-group">
         <label>Nama Institusi</label>
@@ -1286,7 +1531,7 @@
         <input type="text" class="form-control" id="setMotto" placeholder="Motto sekolah">
       </div>
       <div class="form-group">
-        <label>Volume Alarm</label>
+        <label>Volume Bell/Alarm</label>
         <div class="slider-container">
           <input type="range" class="slider" id="volumeSlider" min="0" max="100" value="80">
           <div class="slider-value" id="volumeValue">80%</div>
@@ -1305,9 +1550,40 @@
       </button>
     </div>
 
+    <!-- TAB: TEMA -->
+    <div class="settings-section" id="tab-theme">
+      <div class="form-group">
+        <label>Pilih Warna Tema</label>
+        <div class="theme-grid" id="themeGrid"></div>
+      </div>
+      <div class="form-group">
+        <label>Kepekatan Overlay</label>
+        <div class="slider-container">
+          <input type="range" class="slider" id="overlaySlider" min="0" max="100" value="82">
+          <div class="slider-value" id="overlayValue">82%</div>
+        </div>
+      </div>
+      <button class="btn btn-secondary btn-block" id="resetTheme">
+        <i class="fas fa-undo"></i> Reset ke Tema Default
+      </button>
+    </div>
+
+    <!-- TAB: WALLPAPER -->
     <div class="settings-section" id="tab-wallpaper">
       <div class="form-group">
-        <label>Pilih Wallpaper Bawaan</label>
+        <label>Slideshow Foto (maks 3 foto)</label>
+        <div class="slideshow-grid" id="slideshowGrid"></div>
+      </div>
+      <div class="form-group">
+        <label>Interval Ganti Slide</label>
+        <div class="slider-container">
+          <input type="range" class="slider" id="slideIntervalSlider" min="3" max="30" value="8">
+          <div class="slider-value" id="slideIntervalValue">8 dtk</div>
+        </div>
+      </div>
+      <hr style="border: 0; border-top: 1px solid var(--card-border); margin: 16px 0;">
+      <div class="form-group">
+        <label>Pilih Wallpaper Bawaan (Background)</label>
         <div class="wallpaper-grid" id="wallpaperGrid"></div>
       </div>
       <div class="form-group">
@@ -1318,7 +1594,7 @@
         </button>
       </div>
       <div class="form-group">
-        <label>Upload Gambar Custom</label>
+        <label>Upload Gambar Custom (Background)</label>
         <div class="file-upload">
           <input type="file" id="wallpaperFile" accept="image/*">
           <div class="upload-area">
@@ -1327,23 +1603,28 @@
           </div>
         </div>
       </div>
-      <div class="form-group">
-        <label>Kepekatan Overlay</label>
-        <div class="slider-container">
-          <input type="range" class="slider" id="overlaySlider" min="0" max="100" value="82">
-          <div class="slider-value" id="overlayValue">82%</div>
-        </div>
-      </div>
       <button class="btn btn-secondary btn-block" id="resetWallpaper">
         <i class="fas fa-undo"></i> Reset Default
       </button>
     </div>
 
+    <!-- TAB: BEL SEKOLAH -->
+    <div class="settings-section" id="tab-bell">
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px; padding: 12px; background: rgba(244, 196, 48, 0.08); border-radius: 10px; border-left: 3px solid var(--accent);">
+        <i class="fas fa-info-circle"></i> Setiap bell bisa diisi MP3 sendiri. Kalau tidak upload MP3, akan pakai suara beep default.
+      </p>
+      <div id="bellSlots"></div>
+      <button class="btn btn-primary btn-block" id="saveBells" style="margin-top: 12px;">
+        <i class="fas fa-save"></i> Simpan Semua Bell
+      </button>
+    </div>
+
+    <!-- TAB: ALARM LAIN -->
     <div class="settings-section" id="tab-alarm">
       <div class="form-group">
-        <label>Tambah Alarm Baru</label>
+        <label>Tambah Alarm Lain</label>
         <input type="time" class="form-control" id="newAlarmTime" style="margin-bottom: 8px;">
-        <input type="text" class="form-control" id="newAlarmLabel" placeholder="Label alarm (contoh: Jam Istirahat)" style="margin-bottom: 8px;">
+        <input type="text" class="form-control" id="newAlarmLabel" placeholder="Label alarm" style="margin-bottom: 8px;">
         <div class="file-upload" style="margin-bottom: 8px;">
           <input type="file" id="alarmMusicFile" accept="audio/*">
           <div class="upload-area">
@@ -1364,15 +1645,16 @@
       </div>
 
       <button class="btn btn-secondary btn-block" id="testAlarm">
-        <i class="fas fa-volume-up"></i> Tes Alarm
+        <i class="fas fa-volume-up"></i> Tes Alarm Default
       </button>
     </div>
 
+    <!-- TAB: JADWAL -->
     <div class="settings-section" id="tab-schedule">
       <div class="form-group">
         <label>Tambah Jadwal Kelas</label>
         <input type="text" class="form-control" id="newScheduleClass" placeholder="Nama kelas (contoh: KELAS 7-1)" style="margin-bottom: 8px;">
-        <input type="text" class="form-control" id="newScheduleSubject" placeholder="Mata pelajaran (contoh: B. JERMAN)" style="margin-bottom: 8px;">
+        <input type="text" class="form-control" id="newScheduleSubject" placeholder="Mata pelajaran" style="margin-bottom: 8px;">
         <div style="display: flex; gap: 8px; margin-bottom: 8px;">
           <input type="time" class="form-control" id="newScheduleStart" placeholder="Mulai">
           <input type="time" class="form-control" id="newScheduleEnd" placeholder="Selesai">
@@ -1398,34 +1680,6 @@
       </button>
     </div>
 
-    <div class="settings-section" id="tab-image">
-      <div class="form-group">
-        <label>Judul Foto</label>
-        <input type="text" class="form-control" id="setBuildingTitle" placeholder="Gedung Utama Sekolah">
-      </div>
-      <div class="form-group">
-        <label>Subtitle Foto</label>
-        <input type="text" class="form-control" id="setBuildingSubtitle" placeholder="Deskripsi singkat">
-      </div>
-      <div class="form-group">
-        <label>URL Foto Gedung</label>
-        <input type="text" class="form-control" id="setBuildingImg" placeholder="https://...">
-      </div>
-      <div class="form-group">
-        <label>Atau Upload Foto</label>
-        <div class="file-upload">
-          <input type="file" id="buildingFile" accept="image/*">
-          <div class="upload-area">
-            <i class="fas fa-image"></i>
-            <p>Klik untuk upload foto gedung (max 5MB)</p>
-          </div>
-        </div>
-      </div>
-      <button class="btn btn-primary btn-block" id="saveImage">
-        <i class="fas fa-save"></i> Simpan Foto
-      </button>
-    </div>
-
   </div>
 </aside>
 
@@ -1446,6 +1700,119 @@
 </div>
 
 <script>
+// ============================================
+// THEMES
+// ============================================
+const themes = [
+  {
+    id: 'islamic-green',
+    name: 'Hijau Islamic',
+    primary: '#1a8a6f',
+    primaryDark: '#0d5240',
+    primaryLight: '#4dd0a8',
+    accent: '#f4c430',
+    accent2: '#ffd966',
+    accent3: '#ff8c42',
+    bgOverlay: 'rgba(6, 24, 22, 0.82)',
+    pattern1: 'rgba(26, 138, 111, 0.18)',
+    pattern2: 'rgba(244, 196, 48, 0.12)'
+  },
+  {
+    id: 'royal-blue',
+    name: 'Biru Royal',
+    primary: '#2563eb',
+    primaryDark: '#1e40af',
+    primaryLight: '#60a5fa',
+    accent: '#fbbf24',
+    accent2: '#fcd34d',
+    accent3: '#f97316',
+    bgOverlay: 'rgba(8, 15, 35, 0.82)',
+    pattern1: 'rgba(37, 99, 235, 0.18)',
+    pattern2: 'rgba(251, 191, 36, 0.12)'
+  },
+  {
+    id: 'royal-purple',
+    name: 'Ungu Royal',
+    primary: '#7c3aed',
+    primaryDark: '#5b21b6',
+    primaryLight: '#a78bfa',
+    accent: '#fbbf24',
+    accent2: '#fde047',
+    accent3: '#fb7185',
+    bgOverlay: 'rgba(20, 10, 35, 0.82)',
+    pattern1: 'rgba(124, 58, 237, 0.18)',
+    pattern2: 'rgba(251, 191, 36, 0.12)'
+  },
+  {
+    id: 'sunset-orange',
+    name: 'Sunset Orange',
+    primary: '#ea580c',
+    primaryDark: '#9a3412',
+    primaryLight: '#fb923c',
+    accent: '#facc15',
+    accent2: '#fde047',
+    accent3: '#dc2626',
+    bgOverlay: 'rgba(30, 15, 5, 0.82)',
+    pattern1: 'rgba(234, 88, 12, 0.18)',
+    pattern2: 'rgba(250, 204, 21, 0.12)'
+  },
+  {
+    id: 'crimson-red',
+    name: 'Merah Crimson',
+    primary: '#dc2626',
+    primaryDark: '#991b1b',
+    primaryLight: '#f87171',
+    accent: '#fbbf24',
+    accent2: '#fcd34d',
+    accent3: '#f97316',
+    bgOverlay: 'rgba(30, 5, 5, 0.82)',
+    pattern1: 'rgba(220, 38, 38, 0.18)',
+    pattern2: 'rgba(251, 191, 36, 0.12)'
+  },
+  {
+    id: 'teal-ocean',
+    name: 'Teal Ocean',
+    primary: '#0d9488',
+    primaryDark: '#115e59',
+    primaryLight: '#5eead4',
+    accent: '#f59e0b',
+    accent2: '#fbbf24',
+    accent3: '#fb7185',
+    bgOverlay: 'rgba(5, 25, 30, 0.82)',
+    pattern1: 'rgba(13, 148, 136, 0.18)',
+    pattern2: 'rgba(245, 158, 11, 0.12)'
+  },
+  {
+    id: 'dark-gold',
+    name: 'Emas Gelap',
+    primary: '#a16207',
+    primaryDark: '#713f12',
+    primaryLight: '#fde047',
+    accent: '#facc15',
+    accent2: '#fde047',
+    accent3: '#ea580c',
+    bgOverlay: 'rgba(20, 15, 5, 0.85)',
+    pattern1: 'rgba(161, 98, 7, 0.18)',
+    pattern2: 'rgba(250, 204, 21, 0.12)'
+  },
+  {
+    id: 'midnight-indigo',
+    name: 'Indigo Malam',
+    primary: '#4338ca',
+    primaryDark: '#312e81',
+    primaryLight: '#818cf8',
+    accent: '#22d3ee',
+    accent2: '#67e8f9',
+    accent3: '#f472b6',
+    bgOverlay: 'rgba(10, 10, 30, 0.85)',
+    pattern1: 'rgba(67, 56, 202, 0.18)',
+    pattern2: 'rgba(34, 211, 238, 0.12)'
+  }
+];
+
+// ============================================
+// STATE
+// ============================================
 const state = {
   school: {
     name: 'PPTQ JASMA DIGITAL',
@@ -1455,23 +1822,39 @@ const state = {
     arabic: 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
     motto: 'Belajar • Beriman • Beramal'
   },
+  theme: 'islamic-green',
   wallpaper: {
     type: 'preset',
     value: 'gradient1',
     custom: null,
     overlay: 82
   },
+  slideshow: {
+    images: [],
+    interval: 8,
+    currentIndex: 0
+  },
   building: {
     title: 'Gedung Utama Sekolah',
-    subtitle: 'Pusat kegiatan belajar mengajar',
-    image: 'https://images.unsplash.com/photo-1562774053-701439336967?w=1200',
-    custom: null
+    subtitle: 'Pusat kegiatan belajar mengajar'
   },
   volume: 80,
   announcements: {
-    left: 'Seluruh siswa wajib berpakaian seragam lengkap, rapi, dan bersepatu hitam saat masuk sekolah. Toleransi maksimal 15 menit dari jam masuk.',
-    right: 'Awal pendaftaran siswa ber 57 hari lagi. Hubungi panitia penerimaan siswa baru di ruang TU. Terima kasih.'
+    left: 'Seluruh siswa wajib berpakaian seragam lengkap, rapi, dan bersepatu hitam saat masuk sekolah.',
+    right: 'Awal pendaftaran siswa ber 57 hari lagi. Hubungi panitia penerimaan siswa baru di ruang TU.'
   },
+  bells: {
+    'masuk': { time: '07:00', label: 'Jam Masuk Sekolah', music: null, musicName: '', enabled: true },
+    'istirahat1': { time: '09:30', label: 'Jam Istirahat 1', music: null, musicName: '', enabled: true },
+    'ganti1': { time: '09:45', label: 'Ganti Pelajaran 1', music: null, musicName: '', enabled: true },
+    'ganti2': { time: '10:45', label: 'Ganti Pelajaran 2', music: null, musicName: '', enabled: true },
+    'istirahat2': { time: '11:30', label: 'Jam Istirahat 2', music: null, musicName: '', enabled: true },
+    'ganti3': { time: '12:30', label: 'Ganti Pelajaran 3', music: null, musicName: '', enabled: true },
+    'ganti4': { time: '13:30', label: 'Ganti Pelajaran 4', music: null, musicName: '', enabled: true },
+    'ganti5': { time: '14:30', label: 'Ganti Pelajaran 5', music: null, musicName: '', enabled: true },
+    'pulang': { time: '15:30', label: 'Jam Pulang Sekolah', music: null, musicName: '', enabled: true }
+  },
+  bellTriggered: {},
   alarms: [],
   schedules: []
 };
@@ -1501,28 +1884,32 @@ const defaultSchedules = [
   { id: 10, class: 'KELAS 9-2', subject: 'PKn', start: '09:00', end: '10:30', column: 'right' }
 ];
 
+// ============================================
+// STORAGE
+// ============================================
 function saveState() {
   try {
     const stateCopy = JSON.parse(JSON.stringify(state));
     const size = JSON.stringify(stateCopy).length;
-    if (size > 4500000) {
+    if (size > 4000000) {
       stateCopy.wallpaper.custom = null;
-      stateCopy.building.custom = null;
-      stateCopy.alarms = stateCopy.alarms.map(a => ({ ...a, music: null }));
+      stateCopy.slideshow.images = stateCopy.slideshow.images.map(img => {
+        if (img && img.startsWith('data:') && img.length > 500000) return null;
+        return img;
+      });
+      Object.keys(stateCopy.bells).forEach(k => {
+        if (stateCopy.bells[k].music && stateCopy.bells[k].music.length > 500000) {
+          stateCopy.bells[k].music = null;
+        }
+      });
+      stateCopy.alarms = stateCopy.alarms.map(a => {
+        if (a.music && a.music.length > 500000) a.music = null;
+        return a;
+      });
     }
     localStorage.setItem('pptqDisplayState', JSON.stringify(stateCopy));
   } catch (e) {
     console.warn('Save failed:', e);
-    const minimal = {
-      school: state.school,
-      wallpaper: { ...state.wallpaper, custom: null },
-      building: { ...state.building, custom: null },
-      volume: state.volume,
-      announcements: state.announcements,
-      alarms: state.alarms.map(a => ({ ...a, music: null })),
-      schedules: state.schedules
-    };
-    try { localStorage.setItem('pptqDisplayState', JSON.stringify(minimal)); } catch(e2) {}
   }
 }
 
@@ -1532,6 +1919,22 @@ function loadState() {
     try {
       const parsed = JSON.parse(saved);
       Object.assign(state, parsed);
+      // Pastikan semua bell keys ada
+      const defaultBells = {
+        'masuk': { time: '07:00', label: 'Jam Masuk Sekolah', music: null, musicName: '', enabled: true },
+        'istirahat1': { time: '09:30', label: 'Jam Istirahat 1', music: null, musicName: '', enabled: true },
+        'ganti1': { time: '09:45', label: 'Ganti Pelajaran 1', music: null, musicName: '', enabled: true },
+        'ganti2': { time: '10:45', label: 'Ganti Pelajaran 2', music: null, musicName: '', enabled: true },
+        'istirahat2': { time: '11:30', label: 'Jam Istirahat 2', music: null, musicName: '', enabled: true },
+        'ganti3': { time: '12:30', label: 'Ganti Pelajaran 3', music: null, musicName: '', enabled: true },
+        'ganti4': { time: '13:30', label: 'Ganti Pelajaran 4', music: null, musicName: '', enabled: true },
+        'ganti5': { time: '14:30', label: 'Ganti Pelajaran 5', music: null, musicName: '', enabled: true },
+        'pulang': { time: '15:30', label: 'Jam Pulang Sekolah', music: null, musicName: '', enabled: true }
+      };
+      if (!state.bells) state.bells = defaultBells;
+      Object.keys(defaultBells).forEach(k => {
+        if (!state.bells[k]) state.bells[k] = defaultBells[k];
+      });
     } catch (e) {
       console.error('Load error', e);
     }
@@ -1539,8 +1942,52 @@ function loadState() {
   if (!state.schedules || state.schedules.length === 0) {
     state.schedules = defaultSchedules;
   }
+  if (!state.slideshow) {
+    state.slideshow = { images: [], interval: 8, currentIndex: 0 };
+  }
 }
 
+// ============================================
+// THEME
+// ============================================
+function applyTheme() {
+  const theme = themes.find(t => t.id === state.theme) || themes[0];
+  const root = document.documentElement;
+  root.style.setProperty('--primary', theme.primary);
+  root.style.setProperty('--primary-dark', theme.primaryDark);
+  root.style.setProperty('--primary-light', theme.primaryLight);
+  root.style.setProperty('--accent', theme.accent);
+  root.style.setProperty('--accent-2', theme.accent2);
+  root.style.setProperty('--accent-3', theme.accent3);
+  root.style.setProperty('--bg-overlay', `rgba(6, 24, 22, ${state.wallpaper.overlay / 100})`);
+  
+  // Update pattern overlay
+  const pattern = document.querySelector('.pattern-overlay');
+  if (pattern) {
+    pattern.style.backgroundImage = 
+      `radial-gradient(circle at 15% 25%, ${theme.pattern1} 0%, transparent 40%),
+       radial-gradient(circle at 85% 75%, ${theme.pattern2} 0%, transparent 40%)`;
+  }
+}
+
+function renderThemeGrid() {
+  const grid = document.getElementById('themeGrid');
+  grid.innerHTML = themes.map(t => `
+    <div class="theme-card ${state.theme === t.id ? 'active' : ''}" data-id="${t.id}">
+      <div class="theme-colors">
+        <div class="theme-color" style="background: ${t.primary}"></div>
+        <div class="theme-color" style="background: ${t.primaryLight}"></div>
+        <div class="theme-color" style="background: ${t.accent}"></div>
+        <div class="theme-color" style="background: ${t.accent3}"></div>
+      </div>
+      <div class="theme-name">${t.name}</div>
+    </div>
+  `).join('');
+}
+
+// ============================================
+// CLOCK & DATE
+// ============================================
 const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
@@ -1561,9 +2008,13 @@ function updateClock() {
   document.getElementById('clockSeconds').textContent = seconds;
   
   updateActivity();
+  checkBells();
   checkAlarms();
 }
 
+// ============================================
+// SCHEDULE
+// ============================================
 function timeToMinutes(t) {
   const [h, m] = t.split(':').map(Number);
   return h * 60 + m;
@@ -1660,6 +2111,96 @@ function renderScheduleItems(schedules, currentIds, nextFirstId) {
   }).join('');
 }
 
+// ============================================
+// BELL SYSTEM
+// ============================================
+function checkBells() {
+  const now = new Date();
+  const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  const sec = now.getSeconds();
+  
+  if (sec !== 0) return;
+  
+  Object.keys(state.bells).forEach(key => {
+    const bell = state.bells[key];
+    if (bell.enabled && bell.time === currentTime && !state.bellTriggered[key]) {
+      triggerBell(key, bell);
+      state.bellTriggered[key] = true;
+      setTimeout(() => { state.bellTriggered[key] = false; }, 65000);
+    }
+  });
+}
+
+function triggerBell(key, bell) {
+  stopAlarmAudio();
+  
+  if (bell.music) {
+    alarmAudio = new Audio(bell.music);
+    alarmAudio.volume = state.volume / 100;
+    alarmAudio.loop = true;
+    alarmAudio.play().catch(e => {
+      console.warn('Bell audio failed', e);
+      showToast('Klik halaman untuk mengaktifkan audio', 'info');
+    });
+  } else {
+    startBeepAlarm();
+  }
+  
+  document.getElementById('alarmModalTitle').textContent = bell.label;
+  document.getElementById('alarmModalLabel').textContent = `Pukul ${bell.time}`;
+  document.getElementById('alarmModal').classList.add('show');
+}
+
+function renderBellSlots() {
+  const container = document.getElementById('bellSlots');
+  const bellIcons = {
+    'masuk': 'fa-door-open',
+    'istirahat1': 'fa-coffee',
+    'ganti1': 'fa-exchange-alt',
+    'ganti2': 'fa-exchange-alt',
+    'istirahat2': 'fa-utensils',
+    'ganti3': 'fa-exchange-alt',
+    'ganti4': 'fa-exchange-alt',
+    'ganti5': 'fa-exchange-alt',
+    'pulang': 'fa-door-closed'
+  };
+  
+  container.innerHTML = Object.keys(state.bells).map(key => {
+    const bell = state.bells[key];
+    return `
+      <div class="bell-slot" data-key="${key}">
+        <div class="bell-header">
+          <div class="bell-name">
+            <i class="fas ${bellIcons[key] || 'fa-bell'}"></i> ${bell.label}
+          </div>
+          <div class="toggle-switch ${bell.enabled ? 'active' : ''}" data-bell-key="${key}" data-action="bell-toggle"></div>
+        </div>
+        <div class="bell-content">
+          <input type="time" value="${bell.time}" data-bell-key="${key}" data-action="bell-time">
+          <div class="bell-file-upload">
+            <input type="file" accept="audio/*" data-bell-key="${key}" data-action="bell-music">
+            <button class="bell-file-btn" type="button">
+              <i class="fas fa-music"></i> ${bell.musicName || 'Pilih MP3'}
+            </button>
+          </div>
+        </div>
+        <div class="bell-actions">
+          <span class="file-name" id="bellFileName-${key}">${bell.musicName || 'Pakai suara beep default'}</span>
+          <button class="icon-btn" data-bell-key="${key}" data-action="bell-test" title="Tes">
+            <i class="fas fa-play"></i>
+          </button>
+          <button class="icon-btn" data-bell-key="${key}" data-action="bell-clear" title="Hapus MP3" style="color: var(--danger);">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ============================================
+// ALARM SYSTEM (custom alarms)
+// ============================================
 let alarmAudio = null;
 let beepCtx = null;
 let beepInterval = null;
@@ -1774,6 +2315,9 @@ function updateAlarmList() {
   `).join('');
 }
 
+// ============================================
+// WALLPAPER & SLIDESHOW
+// ============================================
 function applyWallpaper() {
   const layer = document.getElementById('wallpaper-layer');
   document.documentElement.style.setProperty('--bg-overlay', `rgba(6, 24, 22, ${state.wallpaper.overlay / 100})`);
@@ -1807,18 +2351,129 @@ function renderWallpaperGrid() {
   `).join('');
 }
 
-function applyBuildingImage() {
-  const img = document.getElementById('buildingImg');
-  document.getElementById('buildingTitle').textContent = state.building.title;
-  document.getElementById('buildingSubtitle').textContent = state.building.subtitle;
+// Slideshow untuk foto tengah
+let slideshowInterval = null;
+
+function renderBuildingSlides() {
+  const container = document.getElementById('buildingImage');
+  const indicators = document.getElementById('slideIndicators');
   
-  if (state.building.custom) {
-    img.src = state.building.custom;
+  // Hapus slide lama
+  container.querySelectorAll('.slide').forEach(s => s.remove());
+  
+  const images = state.slideshow.images.filter(Boolean);
+  
+  if (images.length === 0) {
+    // Default image
+    const slide = document.createElement('div');
+    slide.className = 'slide active';
+    slide.style.backgroundImage = `url("https://images.unsplash.com/photo-1562774053-701439336967?w=1200")`;
+    container.insertBefore(slide, container.firstChild);
+    indicators.innerHTML = '';
   } else {
-    img.src = state.building.image;
+    images.forEach((img, idx) => {
+      const slide = document.createElement('div');
+      slide.className = 'slide' + (idx === state.slideshow.currentIndex ? ' active' : '');
+      slide.style.backgroundImage = `url("${img}")`;
+      container.insertBefore(slide, container.firstChild);
+    });
+    indicators.innerHTML = images.map((_, idx) => 
+      `<div class="slide-indicator ${idx === state.slideshow.currentIndex ? 'active' : ''}"></div>`
+    ).join('');
   }
 }
 
+function startSlideshow() {
+  if (slideshowInterval) clearInterval(slideshowInterval);
+  
+  const images = state.slideshow.images.filter(Boolean);
+  if (images.length <= 1) return;
+  
+  slideshowInterval = setInterval(() => {
+    const imgs = state.slideshow.images.filter(Boolean);
+    if (imgs.length <= 1) return;
+    
+    state.slideshow.currentIndex = (state.slideshow.currentIndex + 1) % imgs.length;
+    
+    const slides = document.querySelectorAll('#buildingImage .slide');
+    const indicators = document.querySelectorAll('#slideIndicators .slide-indicator');
+    
+    slides.forEach((s, idx) => {
+      s.classList.toggle('active', idx === state.slideshow.currentIndex);
+    });
+    indicators.forEach((ind, idx) => {
+      ind.classList.toggle('active', idx === state.slideshow.currentIndex);
+    });
+  }, state.slideshow.interval * 1000);
+}
+
+function renderSlideshowGrid() {
+  const grid = document.getElementById('slideshowGrid');
+  const slots = [];
+  
+  for (let i = 0; i < 3; i++) {
+    const img = state.slideshow.images[i];
+    slots.push(`
+      <div class="slide-slot" data-slot="${i}">
+        ${img ? `<img src="${img}" alt="Slide ${i+1}"><button class="remove-btn" data-remove="${i}"><i class="fas fa-times"></i></button>` : 
+        `<div class="slot-content"><i class="fas fa-plus"></i><p>Foto ${i+1}</p></div>`}
+        <input type="file" accept="image/*" data-slot="${i}" style="display: none;">
+      </div>
+    `);
+  }
+  
+  grid.innerHTML = slots.join('');
+  
+  // Bind events
+  grid.querySelectorAll('.slide-slot').forEach(slot => {
+    const fileInput = slot.querySelector('input[type="file"]');
+    
+    slot.addEventListener('click', (e) => {
+      if (e.target.closest('.remove-btn')) return;
+      fileInput.click();
+    });
+    
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) {
+        showToast('Ukuran file terlalu besar (max 5MB)', 'error');
+        return;
+      }
+      const slotIdx = parseInt(fileInput.dataset.slot);
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        if (!state.slideshow.images) state.slideshow.images = [];
+        state.slideshow.images[slotIdx] = ev.target.result;
+        renderSlideshowGrid();
+        renderBuildingSlides();
+        startSlideshow();
+        saveState();
+        showToast('Foto slideshow ditambahkan', 'success');
+      };
+      reader.readAsDataURL(file);
+    });
+  });
+  
+  grid.querySelectorAll('.remove-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const idx = parseInt(btn.dataset.remove);
+      state.slideshow.images[idx] = null;
+      state.slideshow.images = state.slideshow.images.filter(Boolean);
+      state.slideshow.currentIndex = 0;
+      renderSlideshowGrid();
+      renderBuildingSlides();
+      startSlideshow();
+      saveState();
+      showToast('Foto dihapus dari slideshow', 'info');
+    });
+  });
+}
+
+// ============================================
+// PARTICLES
+// ============================================
 function createParticles() {
   const container = document.getElementById('particles');
   container.innerHTML = '';
@@ -1836,6 +2491,9 @@ function createParticles() {
   }
 }
 
+// ============================================
+// TOAST
+// ============================================
 function showToast(message, type) {
   type = type || 'info';
   const toast = document.getElementById('toast');
@@ -1852,6 +2510,9 @@ function showToast(message, type) {
   setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
+// ============================================
+// SETTINGS
+// ============================================
 function openSettings() {
   document.getElementById('settingsOverlay').classList.add('active');
   document.getElementById('settingsPanel').classList.add('active');
@@ -1868,11 +2529,13 @@ function openSettings() {
   document.getElementById('setAnnouncement2').value = state.announcements.right;
   document.getElementById('overlaySlider').value = state.wallpaper.overlay;
   document.getElementById('overlayValue').textContent = state.wallpaper.overlay + '%';
-  document.getElementById('setBuildingTitle').value = state.building.title;
-  document.getElementById('setBuildingSubtitle').value = state.building.subtitle;
-  document.getElementById('setBuildingImg').value = state.building.image;
+  document.getElementById('slideIntervalSlider').value = state.slideshow.interval;
+  document.getElementById('slideIntervalValue').textContent = state.slideshow.interval + ' dtk';
   
+  renderThemeGrid();
   renderWallpaperGrid();
+  renderSlideshowGrid();
+  renderBellSlots();
   updateAlarmList();
   updateScheduleListSettings();
 }
@@ -1916,9 +2579,13 @@ function applySettings() {
   document.querySelector('.header-center .motto').textContent = state.school.motto;
   document.getElementById('footerAnnouncement1').textContent = state.announcements.left;
   document.getElementById('footerAnnouncement2').textContent = state.announcements.right;
-  applyBuildingImage();
+  document.getElementById('buildingTitle').textContent = state.building.title;
+  document.getElementById('buildingSubtitle').textContent = state.building.subtitle;
 }
 
+// ============================================
+// EVENTS
+// ============================================
 document.getElementById('openSettings').addEventListener('click', openSettings);
 document.getElementById('closeSettings').addEventListener('click', closeSettings);
 document.getElementById('settingsOverlay').addEventListener('click', closeSettings);
@@ -1932,6 +2599,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
   });
 });
 
+// Save general
 document.getElementById('saveGeneral').addEventListener('click', () => {
   state.school.name = document.getElementById('setSchoolName').value;
   state.school.address = document.getElementById('setSchoolAddress').value;
@@ -1947,17 +2615,51 @@ document.getElementById('saveGeneral').addEventListener('click', () => {
   showToast('Pengaturan berhasil disimpan', 'success');
 });
 
+// Volume
 document.getElementById('volumeSlider').addEventListener('input', (e) => {
   state.volume = parseInt(e.target.value);
   document.getElementById('volumeValue').textContent = state.volume + '%';
 });
 
+// Overlay
 document.getElementById('overlaySlider').addEventListener('input', (e) => {
   state.wallpaper.overlay = parseInt(e.target.value);
   document.getElementById('overlayValue').textContent = state.wallpaper.overlay + '%';
+  applyTheme();
   applyWallpaper();
 });
 
+// Slide interval
+document.getElementById('slideIntervalSlider').addEventListener('input', (e) => {
+  state.slideshow.interval = parseInt(e.target.value);
+  document.getElementById('slideIntervalValue').textContent = state.slideshow.interval + ' dtk';
+  startSlideshow();
+});
+
+// Theme grid
+document.getElementById('themeGrid').addEventListener('click', (e) => {
+  const card = e.target.closest('.theme-card');
+  if (!card) return;
+  state.theme = card.dataset.id;
+  applyTheme();
+  renderThemeGrid();
+  saveState();
+  showToast('Tema diganti', 'success');
+});
+
+// Reset theme
+document.getElementById('resetTheme').addEventListener('click', () => {
+  state.theme = 'islamic-green';
+  state.wallpaper.overlay = 82;
+  document.getElementById('overlaySlider').value = 82;
+  document.getElementById('overlayValue').textContent = '82%';
+  applyTheme();
+  renderThemeGrid();
+  saveState();
+  showToast('Tema direset', 'success');
+});
+
+// Wallpaper grid
 document.getElementById('wallpaperGrid').addEventListener('click', (e) => {
   const item = e.target.closest('.wallpaper-item');
   if (!item) return;
@@ -1972,6 +2674,7 @@ document.getElementById('wallpaperGrid').addEventListener('click', (e) => {
   showToast('Wallpaper diganti', 'success');
 });
 
+// Wallpaper URL
 document.getElementById('applyWallpaperUrl').addEventListener('click', () => {
   const url = document.getElementById('wallpaperUrl').value.trim();
   if (!url) {
@@ -1986,6 +2689,7 @@ document.getElementById('applyWallpaperUrl').addEventListener('click', () => {
   showToast('Wallpaper diterapkan', 'success');
 });
 
+// Wallpaper upload
 document.getElementById('wallpaperFile').addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -2005,19 +2709,72 @@ document.getElementById('wallpaperFile').addEventListener('change', (e) => {
   reader.readAsDataURL(file);
 });
 
+// Reset wallpaper
 document.getElementById('resetWallpaper').addEventListener('click', () => {
   state.wallpaper.type = 'preset';
   state.wallpaper.value = 'gradient1';
   state.wallpaper.custom = null;
-  state.wallpaper.overlay = 82;
-  document.getElementById('overlaySlider').value = 82;
-  document.getElementById('overlayValue').textContent = '82%';
   renderWallpaperGrid();
   applyWallpaper();
   saveState();
   showToast('Wallpaper direset', 'success');
 });
 
+// BELL events
+document.getElementById('bellSlots').addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-action]');
+  if (!btn) return;
+  const key = btn.dataset.bellKey;
+  const action = btn.dataset.action;
+  
+  if (action === 'bell-toggle') {
+    state.bells[key].enabled = !state.bells[key].enabled;
+    renderBellSlots();
+    saveState();
+  } else if (action === 'bell-test') {
+    triggerBell(key, state.bells[key]);
+  } else if (action === 'bell-clear') {
+    state.bells[key].music = null;
+    state.bells[key].musicName = '';
+    renderBellSlots();
+    saveState();
+    showToast('MP3 dihapus, pakai beep default', 'info');
+  }
+});
+
+document.getElementById('bellSlots').addEventListener('change', (e) => {
+  const input = e.target;
+  if (input.dataset.action === 'bell-time') {
+    const key = input.dataset.bellKey;
+    state.bells[key].time = input.value;
+    saveState();
+    showToast(`Waktu ${state.bells[key].label} diupdate`, 'success');
+  } else if (input.dataset.action === 'bell-music') {
+    const key = input.dataset.bellKey;
+    const file = input.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      showToast('Ukuran file terlalu besar (max 5MB)', 'error');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      state.bells[key].music = ev.target.result;
+      state.bells[key].musicName = file.name;
+      renderBellSlots();
+      saveState();
+      showToast(`MP3 untuk ${state.bells[key].label} disimpan`, 'success');
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+document.getElementById('saveBells').addEventListener('click', () => {
+  saveState();
+  showToast('Semua bell sekolah disimpan', 'success');
+});
+
+// Alarm (custom)
 document.getElementById('addAlarm').addEventListener('click', () => {
   const time = document.getElementById('newAlarmTime').value;
   const label = document.getElementById('newAlarmLabel').value;
@@ -2106,6 +2863,7 @@ document.getElementById('testAlarm').addEventListener('click', () => {
 
 document.getElementById('stopAlarm').addEventListener('click', stopAlarm);
 
+// Schedule
 document.getElementById('addSchedule').addEventListener('click', () => {
   const cls = document.getElementById('newScheduleClass').value;
   const subject = document.getElementById('newScheduleSubject').value;
@@ -2161,36 +2919,7 @@ document.getElementById('clearSchedule').addEventListener('click', () => {
   }
 });
 
-document.getElementById('saveImage').addEventListener('click', () => {
-  state.building.title = document.getElementById('setBuildingTitle').value;
-  state.building.subtitle = document.getElementById('setBuildingSubtitle').value;
-  const imgUrl = document.getElementById('setBuildingImg').value.trim();
-  if (imgUrl) {
-    state.building.image = imgUrl;
-    state.building.custom = null;
-  }
-  applyBuildingImage();
-  saveState();
-  showToast('Foto disimpan', 'success');
-});
-
-document.getElementById('buildingFile').addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  if (file.size > 5 * 1024 * 1024) {
-    showToast('Ukuran file terlalu besar (max 5MB)', 'error');
-    return;
-  }
-  const reader = new FileReader();
-  reader.onload = (ev) => {
-    state.building.custom = ev.target.result;
-    applyBuildingImage();
-    saveState();
-    showToast('Foto diupload', 'success');
-  };
-  reader.readAsDataURL(file);
-});
-
+// Enable audio on click
 document.addEventListener('click', () => {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -2208,10 +2937,16 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+// ============================================
+// INIT
+// ============================================
 function init() {
   loadState();
+  applyTheme();
   applySettings();
   applyWallpaper();
+  renderBuildingSlides();
+  startSlideshow();
   createParticles();
   updateClock();
   setInterval(updateClock, 1000);
