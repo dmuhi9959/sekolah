@@ -1,0 +1,32 @@
+{
+  "name": "Display Sekolah PPTQ Jasma",
+  "short_name": "Display Sekolah",
+  "description": "Display Informasi Sekolah PPTQ Jasma Digital",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#061512",
+  "theme_color": "#1a8a6f",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {
+      "src": "https://images.unsplash.com/photo-1562774053-701439336967?w=192&h=192&fit=crop&auto=format",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1562774053-701439336967?w=512&h=512&fit=crop&auto=format",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1562774053-701439336967?w=512&h=512&fit=crop&auto=format",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
