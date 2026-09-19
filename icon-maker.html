@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Icon Maker</title></head>
+<body style="background:#1a2e28;color:#fff;font-family:sans-serif;text-align:center;padding:40px">
+<h2>Generator Icon PWA</h2>
+<p>Klik tombol di bawah untuk download 2 file PNG icon.</p>
+<p>Setelah download, upload 2 file ke repository GitHub Anda.</p>
+<br>
+<button onclick="downloadIcon(192)" style="padding:15px 30px;font-size:1rem;cursor:pointer;background:#f4c430;color:#1a1a1a;border:none;border-radius:10px;margin:5px">Download icon-192.png</button>
+<button onclick="downloadIcon(512)" style="padding:15px 30px;font-size:1rem;cursor:pointer;background:#f4c430;color:#1a1a1a;border:none;border-radius:10px;margin:5px">Download icon-512.png</button>
+<canvas id="c" style="display:none"></canvas>
+<script>
+function downloadIcon(size){
+  var c=document.getElementById('c');
+  c.width=size;c.height=size;
+  var ctx=c.getContext('2d');
+  // Background gradient
+  var grad=ctx.createLinearGradient(0,0,size,size);
+  grad.addColorStop(0,'#1a8a6f');
+  grad.addColorStop(1,'#0d5240');
+  ctx.fillStyle=grad;
+  ctx.fillRect(0,0,size,size);
+  // Border accent
+  ctx.strokeStyle='#f4c430';
+  ctx.lineWidth=size*0.03;
+  ctx.strokeRect(size*0.05,size*0.05,size*0.9,size*0.9);
+  // Text "PJ"
+  ctx.fillStyle='#f4c430';
+  ctx.font='bold '+size*0.4+'px Arial';
+  ctx.textAlign='center';
+  ctx.textBaseline='middle';
+  ctx.fillText('PJ',size/2,size/2);
+  // Download
+  c.toBlob(function(blob){
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='icon-'+size+'.png';
+    a.click();
+  },'image/png');
+}
+</script>
+</body>
+</html>
