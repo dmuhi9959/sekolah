@@ -46,6 +46,20 @@
     z-index: 0;
   }
 
+  #wallpaper-video {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    display: none;
+  }
+
+  #wallpaper-video.active {
+    display: block;
+  }
+
   #wallpaper-layer::after {
     content: '';
     position: absolute;
@@ -500,6 +514,20 @@
   }
 
   .building-image .slide.active {
+    opacity: 1;
+  }
+
+  .building-image .slide-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 1.5s ease;
+  }
+
+  .building-image .slide-video.active {
     opacity: 1;
   }
 
@@ -1066,7 +1094,7 @@
     background: rgba(244, 196, 48, 0.05);
   }
 
-  .slide-slot img {
+  .slide-slot img, .slide-slot video {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -1106,6 +1134,21 @@
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+
+  .slide-slot .media-badge {
+    position: absolute;
+    bottom: 4px;
+    left: 4px;
+    padding: 2px 8px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 50px;
+    font-size: 0.6rem;
+    color: var(--accent);
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 3px;
   }
 
   .bell-slot {
@@ -1533,6 +1576,7 @@
 <body>
 
 <div id="wallpaper-layer"></div>
+<video id="wallpaper-video" loop muted playsinline></video>
 <div class="pattern-overlay"></div>
 <div class="particles" id="particles"></div>
 
@@ -1751,7 +1795,7 @@
       </div>
 
       <div class="form-group">
-        <label>Warna Utama (Hijau Header & Kolom) ← YANG INI!</label>
+        <label>Warna Utama (Hijau Header & Kolom)</label>
         <div class="color-input-group">
           <input type="color" id="primaryPicker" value="#1a8a6f">
           <input type="text" class="color-text" id="primaryText" value="#1a8a6f">
@@ -1806,7 +1850,7 @@
 
     <div class="settings-section" id="tab-wallpaper">
       <div class="form-group">
-        <label>Slideshow Foto (maks 3 foto)</label>
+        <label>Slideshow Foto & Video (maks 3 media)</label>
         <div class="slideshow-grid" id="slideshowGrid"></div>
       </div>
       <div class="form-group">
@@ -1816,7 +1860,25 @@
           <div class="slider-value" id="slideIntervalValue">8 dtk</div>
         </div>
       </div>
+
       <hr style="border: 0; border-top: 1px solid var(--card-border); margin: 16px 0;">
+
+      <div class="form-group">
+        <label>Video Background (Fullscreen)</label>
+        <div class="file-upload">
+          <input type="file" id="bgVideoFile" accept="video/*">
+          <div class="upload-area">
+            <i class="fas fa-film"></i>
+            <p id="bgVideoName">Upload video pendek untuk background (max 20MB)</p>
+          </div>
+        </div>
+        <button class="btn btn-danger btn-block" id="clearBgVideo" style="margin-top: 8px;">
+          <i class="fas fa-times"></i> Hapus Video Background
+        </button>
+      </div>
+
+      <hr style="border: 0; border-top: 1px solid var(--card-border); margin: 16px 0;">
+
       <div class="form-group">
         <label>Pilih Wallpaper Bawaan (Background)</label>
         <div class="wallpaper-grid" id="wallpaperGrid"></div>
@@ -1933,7 +1995,7 @@
 
 <script>
 // ============================================
-// THEMES (preset)
+// THEMES
 // ============================================
 const themes = [
   { id: 'islamic-green', name: 'Hijau Islamic', bgSolid: '#061512', bgOverlay: '#061810', primary: '#1a8a6f', primaryDark: '#0d5240', primaryLight: '#4dd0a8', accent: '#f4c430', accent2: '#ffd966', accent3: '#ff8c42' },
@@ -1981,8 +2043,9 @@ const state = {
     custom: null,
     overlay: 82
   },
+  bgVideo: null,
   slideshow: {
-    images: [],
+    media: [],
     interval: 8,
     currentIndex: 0
   },
@@ -2045,9 +2108,10 @@ function saveState() {
     const size = JSON.stringify(stateCopy).length;
     if (size > 4000000) {
       stateCopy.wallpaper.custom = null;
-      stateCopy.slideshow.images = stateCopy.slideshow.images.map(img => {
-        if (img && img.startsWith('data:') && img.length > 500000) return null;
-        return img;
+      stateCopy.bgVideo = null;
+      stateCopy.slideshow.media = stateCopy.slideshow.media.map(m => {
+        if (m && m.startsWith('data:') && m.length > 500000) return null;
+        return m;
       });
       Object.keys(stateCopy.bells).forEach(k => {
         if (stateCopy.bells[k].music && stateCopy.bells[k].music.length > 500000) {
@@ -2062,6 +2126,7 @@ function saveState() {
     localStorage.setItem('pptqDisplayState', JSON.stringify(stateCopy));
   } catch (e) {
     console.warn('Save failed:', e);
+    showToast('Data terlalu besar untuk disimpan. Video tidak akan tersimpan permanen.', 'info');
   }
 }
 
@@ -2071,6 +2136,12 @@ function loadState() {
     try {
       const parsed = JSON.parse(saved);
       Object.assign(state, parsed);
+      
+      // Migrate old slideshow.images to new slideshow.media
+      if (state.slideshow && state.slideshow.images && !state.slideshow.media) {
+        state.slideshow.media = state.slideshow.images;
+      }
+      
       const defaultBells = {
         'masuk': { time: '07:00', label: 'Jam Masuk Sekolah', music: null, musicName: '', enabled: true },
         'istirahat1': { time: '09:30', label: 'Jam Istirahat 1', music: null, musicName: '', enabled: true },
@@ -2094,6 +2165,12 @@ function loadState() {
           accent: t.accent, accent2: t.accent2, accent3: t.accent3
         };
       }
+      if (!state.slideshow) {
+        state.slideshow = { media: [], interval: 8, currentIndex: 0 };
+      }
+      if (!state.slideshow.media) {
+        state.slideshow.media = state.slideshow.images || [];
+      }
     } catch (e) {
       console.error('Load error', e);
     }
@@ -2101,13 +2178,10 @@ function loadState() {
   if (!state.schedules || state.schedules.length === 0) {
     state.schedules = defaultSchedules;
   }
-  if (!state.slideshow) {
-    state.slideshow = { images: [], interval: 8, currentIndex: 0 };
-  }
 }
 
 // ============================================
-// THEME APPLY - SEKARANG SEMUA WARNA BISA DIGANTI
+// THEME
 // ============================================
 function hexToRgb(hex) {
   const r = parseInt(hex.slice(1,3), 16);
@@ -2117,12 +2191,9 @@ function hexToRgb(hex) {
 }
 
 function applyTheme() {
-  const theme = themes.find(t => t.id === state.theme) || themes[0];
   const c = state.customColors;
-  
   const root = document.documentElement;
   
-  // PAKAI CUSTOM COLORS - ini kuncinya!
   root.style.setProperty('--bg-solid', c.bgSolid);
   root.style.setProperty('--primary', c.primary);
   root.style.setProperty('--primary-dark', c.primaryDark);
@@ -2131,11 +2202,9 @@ function applyTheme() {
   root.style.setProperty('--accent-2', c.accent2);
   root.style.setProperty('--accent-3', c.accent3);
   
-  // Overlay dengan opacity
   const overlayRgb = hexToRgb(c.bgOverlay);
   root.style.setProperty('--bg-overlay', `rgba(${overlayRgb.r}, ${overlayRgb.g}, ${overlayRgb.b}, ${state.wallpaper.overlay / 100})`);
   
-  // Pattern menggunakan primary color
   const primaryRgb = hexToRgb(c.primary);
   const accentRgb = hexToRgb(c.accent);
   const pattern = document.querySelector('.pattern-overlay');
@@ -2147,7 +2216,6 @@ function applyTheme() {
   
   document.body.style.background = c.bgSolid;
   
-  // Update preview box
   const preview = document.getElementById('colorPreviewBox');
   if (preview) {
     preview.style.background = `linear-gradient(135deg, ${c.primaryDark}, ${c.primary})`;
@@ -2513,26 +2581,42 @@ function updateAlarmList() {
 }
 
 // ============================================
-// WALLPAPER & SLIDESHOW
+// WALLPAPER & BACKGROUND VIDEO
 // ============================================
 function applyWallpaper() {
   const layer = document.getElementById('wallpaper-layer');
+  const bgVideo = document.getElementById('wallpaper-video');
   applyTheme();
   
-  if (state.wallpaper.type === 'preset') {
-    const preset = presetWallpapers.find(w => w.id === state.wallpaper.value);
-    if (preset) {
-      if (preset.type === 'gradient') {
-        layer.style.background = preset.url;
-        layer.style.backgroundImage = 'none';
-      } else {
-        layer.style.backgroundImage = `url("${preset.url}")`;
+  // Jika ada background video, tampilkan video
+  if (state.bgVideo) {
+    bgVideo.src = state.bgVideo;
+    bgVideo.classList.add('active');
+    bgVideo.play().catch(e => {
+      console.warn('Bg video play failed', e);
+    });
+    layer.style.display = 'none';
+  } else {
+    bgVideo.classList.remove('active');
+    bgVideo.pause();
+    bgVideo.removeAttribute('src');
+    layer.style.display = 'block';
+    
+    if (state.wallpaper.type === 'preset') {
+      const preset = presetWallpapers.find(w => w.id === state.wallpaper.value);
+      if (preset) {
+        if (preset.type === 'gradient') {
+          layer.style.background = preset.url;
+          layer.style.backgroundImage = 'none';
+        } else {
+          layer.style.backgroundImage = `url("${preset.url}")`;
+        }
       }
+    } else if (state.wallpaper.type === 'url') {
+      layer.style.backgroundImage = `url("${state.wallpaper.value}")`;
+    } else if (state.wallpaper.type === 'custom' && state.wallpaper.custom) {
+      layer.style.backgroundImage = `url("${state.wallpaper.custom}")`;
     }
-  } else if (state.wallpaper.type === 'url') {
-    layer.style.backgroundImage = `url("${state.wallpaper.value}")`;
-  } else if (state.wallpaper.type === 'custom' && state.wallpaper.custom) {
-    layer.style.backgroundImage = `url("${state.wallpaper.custom}")`;
   }
 }
 
@@ -2548,30 +2632,55 @@ function renderWallpaperGrid() {
   `).join('');
 }
 
+// ============================================
+// SLIDESHOW (Foto + Video)
+// ============================================
 let slideshowInterval = null;
+
+function isVideoMedia(data) {
+  return data && data.startsWith('data:video');
+}
 
 function renderBuildingSlides() {
   const container = document.getElementById('buildingImage');
   const indicators = document.getElementById('slideIndicators');
   
-  container.querySelectorAll('.slide').forEach(s => s.remove());
+  // Hapus slide lama
+  container.querySelectorAll('.slide, .slide-video').forEach(s => s.remove());
   
-  const images = state.slideshow.images.filter(Boolean);
+  const media = state.slideshow.media.filter(Boolean);
   
-  if (images.length === 0) {
+  if (media.length === 0) {
     const slide = document.createElement('div');
     slide.className = 'slide active';
     slide.style.backgroundImage = `url("https://images.unsplash.com/photo-1562774053-701439336967?w=1200")`;
     container.insertBefore(slide, container.firstChild);
     indicators.innerHTML = '';
   } else {
-    images.forEach((img, idx) => {
-      const slide = document.createElement('div');
-      slide.className = 'slide' + (idx === state.slideshow.currentIndex ? ' active' : '');
-      slide.style.backgroundImage = `url("${img}")`;
+    media.forEach((item, idx) => {
+      const isActive = idx === state.slideshow.currentIndex;
+      const isVideo = isVideoMedia(item);
+      
+      let slide;
+      if (isVideo) {
+        slide = document.createElement('video');
+        slide.className = 'slide-video' + (isActive ? ' active' : '');
+        slide.src = item;
+        slide.muted = true;
+        slide.loop = true;
+        slide.playsInline = true;
+        slide.autoplay = true;
+        if (isActive) {
+          slide.play().catch(() => {});
+        }
+      } else {
+        slide = document.createElement('div');
+        slide.className = 'slide' + (isActive ? ' active' : '');
+        slide.style.backgroundImage = `url("${item}")`;
+      }
       container.insertBefore(slide, container.firstChild);
     });
-    indicators.innerHTML = images.map((_, idx) => 
+    indicators.innerHTML = media.map((_, idx) => 
       `<div class="slide-indicator ${idx === state.slideshow.currentIndex ? 'active' : ''}"></div>`
     ).join('');
   }
@@ -2580,20 +2689,30 @@ function renderBuildingSlides() {
 function startSlideshow() {
   if (slideshowInterval) clearInterval(slideshowInterval);
   
-  const images = state.slideshow.images.filter(Boolean);
-  if (images.length <= 1) return;
+  const media = state.slideshow.media.filter(Boolean);
+  if (media.length <= 1) return;
   
   slideshowInterval = setInterval(() => {
-    const imgs = state.slideshow.images.filter(Boolean);
+    const imgs = state.slideshow.media.filter(Boolean);
     if (imgs.length <= 1) return;
     
     state.slideshow.currentIndex = (state.slideshow.currentIndex + 1) % imgs.length;
     
-    const slides = document.querySelectorAll('#buildingImage .slide');
+    const slides = document.querySelectorAll('#buildingImage .slide, #buildingImage .slide-video');
     const indicators = document.querySelectorAll('#slideIndicators .slide-indicator');
     
     slides.forEach((s, idx) => {
-      s.classList.toggle('active', idx === state.slideshow.currentIndex);
+      const isActive = idx === state.slideshow.currentIndex;
+      s.classList.toggle('active', isActive);
+      
+      // Pause video yang tidak aktif, play yang aktif
+      if (s.tagName === 'VIDEO') {
+        if (isActive) {
+          s.play().catch(() => {});
+        } else {
+          s.pause();
+        }
+      }
     });
     indicators.forEach((ind, idx) => {
       ind.classList.toggle('active', idx === state.slideshow.currentIndex);
@@ -2606,12 +2725,37 @@ function renderSlideshowGrid() {
   const slots = [];
   
   for (let i = 0; i < 3; i++) {
-    const img = state.slideshow.images[i];
+    const item = state.slideshow.media[i];
+    const isVideo = isVideoMedia(item);
+    
+    let content;
+    if (item) {
+      if (isVideo) {
+        content = `
+          <video src="${item}" muted preload="metadata"></video>
+          <button class="remove-btn" data-remove="${i}"><i class="fas fa-times"></i></button>
+          <div class="media-badge"><i class="fas fa-video"></i> Video</div>
+        `;
+      } else {
+        content = `
+          <img src="${item}" alt="Slide ${i+1}">
+          <button class="remove-btn" data-remove="${i}"><i class="fas fa-times"></i></button>
+          <div class="media-badge"><i class="fas fa-image"></i> Foto</div>
+        `;
+      }
+    } else {
+      content = `
+        <div class="slot-content">
+          <i class="fas fa-plus"></i>
+          <p>Foto/Video ${i+1}</p>
+        </div>
+      `;
+    }
+    
     slots.push(`
       <div class="slide-slot" data-slot="${i}">
-        ${img ? `<img src="${img}" alt="Slide ${i+1}"><button class="remove-btn" data-remove="${i}"><i class="fas fa-times"></i></button>` : 
-        `<div class="slot-content"><i class="fas fa-plus"></i><p>Foto ${i+1}</p></div>`}
-        <input type="file" accept="image/*" data-slot="${i}" style="display: none;">
+        ${content}
+        <input type="file" accept="image/*,video/*" data-slot="${i}" style="display: none;">
       </div>
     `);
   }
@@ -2629,20 +2773,25 @@ function renderSlideshowGrid() {
     fileInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (!file) return;
-      if (file.size > 5 * 1024 * 1024) {
-        showToast('Ukuran file terlalu besar (max 5MB)', 'error');
+      
+      const isVideo = file.type.startsWith('video/');
+      const maxSize = isVideo ? 20 * 1024 * 1024 : 5 * 1024 * 1024;
+      
+      if (file.size > maxSize) {
+        showToast(`Ukuran file terlalu besar (max ${isVideo ? '20MB' : '5MB'})`, 'error');
         return;
       }
+      
       const slotIdx = parseInt(fileInput.dataset.slot);
       const reader = new FileReader();
       reader.onload = (ev) => {
-        if (!state.slideshow.images) state.slideshow.images = [];
-        state.slideshow.images[slotIdx] = ev.target.result;
+        if (!state.slideshow.media) state.slideshow.media = [];
+        state.slideshow.media[slotIdx] = ev.target.result;
         renderSlideshowGrid();
         renderBuildingSlides();
         startSlideshow();
         saveState();
-        showToast('Foto slideshow ditambahkan', 'success');
+        showToast(isVideo ? 'Video slideshow ditambahkan' : 'Foto slideshow ditambahkan', 'success');
       };
       reader.readAsDataURL(file);
     });
@@ -2652,14 +2801,14 @@ function renderSlideshowGrid() {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const idx = parseInt(btn.dataset.remove);
-      state.slideshow.images[idx] = null;
-      state.slideshow.images = state.slideshow.images.filter(Boolean);
+      state.slideshow.media[idx] = null;
+      state.slideshow.media = state.slideshow.media.filter(Boolean);
       state.slideshow.currentIndex = 0;
       renderSlideshowGrid();
       renderBuildingSlides();
       startSlideshow();
       saveState();
-      showToast('Foto dihapus dari slideshow', 'info');
+      showToast('Media dihapus dari slideshow', 'info');
     });
   });
 }
@@ -2725,7 +2874,8 @@ function openSettings() {
   document.getElementById('slideIntervalSlider').value = state.slideshow.interval;
   document.getElementById('slideIntervalValue').textContent = state.slideshow.interval + ' dtk';
   
-  // Color inputs - SEMUA diisi dari customColors
+  document.getElementById('bgVideoName').textContent = state.bgVideo ? 'Video background sudah diupload' : 'Upload video pendek untuk background (max 20MB)';
+  
   const c = state.customColors;
   document.getElementById('bgSolidPicker').value = c.bgSolid;
   document.getElementById('bgSolidText').value = c.bgSolid;
@@ -2839,25 +2989,18 @@ document.getElementById('overlaySlider').addEventListener('input', (e) => {
   applyTheme();
 });
 
-// ===== TEMA - SEKARANG SEMUA COLOR PICKER AKTIF =====
+// ===== TEMA =====
 document.getElementById('themeGrid').addEventListener('click', (e) => {
   const card = e.target.closest('.theme-card');
   if (!card) return;
   state.theme = card.dataset.id;
   const theme = themes.find(t => t.id === state.theme);
-  // Update semua customColors dari tema yang dipilih
   state.customColors = {
-    bgSolid: theme.bgSolid,
-    bgOverlay: theme.bgOverlay,
-    primary: theme.primary,
-    primaryDark: theme.primaryDark,
-    primaryLight: theme.primaryLight,
-    accent: theme.accent,
-    accent2: theme.accent2,
-    accent3: theme.accent3
+    bgSolid: theme.bgSolid, bgOverlay: theme.bgOverlay,
+    primary: theme.primary, primaryDark: theme.primaryDark, primaryLight: theme.primaryLight,
+    accent: theme.accent, accent2: theme.accent2, accent3: theme.accent3
   };
   
-  // Update semua input warna
   const c = state.customColors;
   document.getElementById('bgSolidPicker').value = c.bgSolid;
   document.getElementById('bgSolidText').value = c.bgSolid;
@@ -2880,7 +3023,6 @@ document.getElementById('themeGrid').addEventListener('click', (e) => {
   showToast('Tema diganti: ' + theme.name, 'success');
 });
 
-// Helper untuk sync color picker
 function syncColorPicker(pickerId, textId, key) {
   const picker = document.getElementById(pickerId);
   const text = document.getElementById(textId);
@@ -2900,7 +3042,6 @@ function syncColorPicker(pickerId, textId, key) {
   });
 }
 
-// SEMUA color picker sekarang sync dengan customColors
 syncColorPicker('bgSolidPicker', 'bgSolidText', 'bgSolid');
 syncColorPicker('overlayPicker', 'overlayText', 'bgOverlay');
 syncColorPicker('primaryPicker', 'primaryText', 'primary');
@@ -2909,7 +3050,6 @@ syncColorPicker('primaryLightPicker', 'primaryLightText', 'primaryLight');
 syncColorPicker('accentPicker', 'accentText', 'accent');
 syncColorPicker('accent3Picker', 'accent3Text', 'accent3');
 
-// Color presets click
 document.querySelectorAll('.color-presets').forEach(container => {
   container.addEventListener('click', (e) => {
     const preset = e.target.closest('.color-preset');
@@ -2918,7 +3058,6 @@ document.querySelectorAll('.color-presets').forEach(container => {
     const key = preset.dataset.key;
     state.customColors[key] = color;
     
-    // Update picker yang sesuai
     const pickerMap = {
       'bgSolid': ['bgSolidPicker', 'bgSolidText'],
       'primary': ['primaryPicker', 'primaryText'],
@@ -2943,14 +3082,9 @@ document.getElementById('resetTheme').addEventListener('click', () => {
   state.theme = 'islamic-green';
   const theme = themes[0];
   state.customColors = {
-    bgSolid: theme.bgSolid,
-    bgOverlay: theme.bgOverlay,
-    primary: theme.primary,
-    primaryDark: theme.primaryDark,
-    primaryLight: theme.primaryLight,
-    accent: theme.accent,
-    accent2: theme.accent2,
-    accent3: theme.accent3
+    bgSolid: theme.bgSolid, bgOverlay: theme.bgOverlay,
+    primary: theme.primary, primaryDark: theme.primaryDark, primaryLight: theme.primaryLight,
+    accent: theme.accent, accent2: theme.accent2, accent3: theme.accent3
   };
   state.wallpaper.overlay = 82;
   document.getElementById('overlaySlider').value = 82;
@@ -2985,6 +3119,38 @@ document.getElementById('slideIntervalSlider').addEventListener('input', (e) => 
   startSlideshow();
 });
 
+// Background video upload
+document.getElementById('bgVideoFile').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('video/')) {
+    showToast('File harus berupa video', 'error');
+    return;
+  }
+  if (file.size > 20 * 1024 * 1024) {
+    showToast('Ukuran video terlalu besar (max 20MB)', 'error');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    state.bgVideo = ev.target.result;
+    applyWallpaper();
+    saveState();
+    document.getElementById('bgVideoName').textContent = file.name;
+    showToast('Video background diupload', 'success');
+  };
+  reader.readAsDataURL(file);
+});
+
+document.getElementById('clearBgVideo').addEventListener('click', () => {
+  state.bgVideo = null;
+  applyWallpaper();
+  saveState();
+  document.getElementById('bgVideoName').textContent = 'Upload video pendek untuk background (max 20MB)';
+  document.getElementById('bgVideoFile').value = '';
+  showToast('Video background dihapus', 'info');
+});
+
 document.getElementById('wallpaperGrid').addEventListener('click', (e) => {
   const item = e.target.closest('.wallpaper-item');
   if (!item) return;
@@ -2992,6 +3158,7 @@ document.getElementById('wallpaperGrid').addEventListener('click', (e) => {
   state.wallpaper.type = 'preset';
   state.wallpaper.value = item.dataset.id;
   state.wallpaper.custom = null;
+  state.bgVideo = null;
   
   renderWallpaperGrid();
   applyWallpaper();
@@ -3008,6 +3175,7 @@ document.getElementById('applyWallpaperUrl').addEventListener('click', () => {
   state.wallpaper.type = 'url';
   state.wallpaper.value = url;
   state.wallpaper.custom = null;
+  state.bgVideo = null;
   applyWallpaper();
   saveState();
   showToast('Wallpaper diterapkan', 'success');
@@ -3025,6 +3193,7 @@ document.getElementById('wallpaperFile').addEventListener('change', (e) => {
     state.wallpaper.type = 'custom';
     state.wallpaper.custom = ev.target.result;
     state.wallpaper.value = null;
+    state.bgVideo = null;
     applyWallpaper();
     saveState();
     showToast('Wallpaper diupload', 'success');
@@ -3036,6 +3205,7 @@ document.getElementById('resetWallpaper').addEventListener('click', () => {
   state.wallpaper.type = 'preset';
   state.wallpaper.value = 'gradient1';
   state.wallpaper.custom = null;
+  state.bgVideo = null;
   renderWallpaperGrid();
   applyWallpaper();
   saveState();
