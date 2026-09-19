@@ -95,7 +95,6 @@
     100% { transform: translateY(-10vh); opacity: 0; }
   }
 
-  /* ============ BELL FLASHING EFFECT ============ */
   .bell-flash-overlay {
     position: fixed;
     inset: 0;
@@ -197,7 +196,6 @@
     50% { color: #ffff00; }
   }
 
-  /* ============ MAIN LAYOUT ============ */
   .display-container {
     position: relative;
     z-index: 10;
@@ -367,7 +365,7 @@
     font-size: 0.9rem;
     text-transform: uppercase;
     letter-spacing: 1.5px;
-    box-shadow: 0 4px 12px rgba(13, 82, 64, 0.4);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(244, 196, 48, 0.3);
     display: flex;
     align-items: center;
@@ -714,7 +712,6 @@
     100% { transform: translateX(-100%); }
   }
 
-  /* ============ SETTINGS PANEL ============ */
   .settings-overlay {
     position: fixed;
     inset: 0;
@@ -931,6 +928,18 @@
   .color-preset:hover {
     transform: scale(1.1);
     border-color: rgba(255,255,255,0.3);
+  }
+
+  .color-preview-box {
+    margin-top: 12px;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid var(--card-border);
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+    text-align: center;
+    font-weight: 700;
+    color: #fff;
+    font-size: 0.9rem;
   }
 
   .btn {
@@ -1527,7 +1536,6 @@
 <div class="pattern-overlay"></div>
 <div class="particles" id="particles"></div>
 
-<!-- Flashing overlay saat bell berbunyi -->
 <div class="bell-flash-overlay"></div>
 <div class="bell-border"></div>
 
@@ -1662,7 +1670,6 @@
 
   <div class="settings-body">
 
-    <!-- TAB: UMUM -->
     <div class="settings-section active" id="tab-general">
       <div class="form-group">
         <label>Nama Institusi</label>
@@ -1708,27 +1715,33 @@
       </button>
     </div>
 
-    <!-- TAB: TEMA -->
     <div class="settings-section" id="tab-theme">
       <div class="form-group">
-        <label>Pilih Warna Tema (Background)</label>
+        <label>Pilih Tema Cepat</label>
         <div class="theme-grid" id="themeGrid"></div>
       </div>
+
+      <hr style="border: 0; border-top: 1px solid var(--card-border); margin: 20px 0;">
+      
+      <h3 style="font-size: 0.95rem; margin-bottom: 16px; color: var(--accent);">Ganti Warna Manual</h3>
+
       <div class="form-group">
-        <label>Warna Background Custom</label>
+        <label>Warna Background Utama</label>
         <div class="color-input-group">
-          <input type="color" id="bgColorPicker" value="#061512">
-          <input type="text" class="color-text" id="bgColorText" value="#061512">
+          <input type="color" id="bgSolidPicker" value="#061512">
+          <input type="text" class="color-text" id="bgSolidText" value="#061512">
         </div>
-        <div class="color-presets" id="bgColorPresets"></div>
+        <div class="color-presets" id="bgSolidPresets"></div>
       </div>
+
       <div class="form-group">
-        <label>Warna Overlay (Transparan)</label>
+        <label>Warna Overlay (Lapisan Transparan)</label>
         <div class="color-input-group">
-          <input type="color" id="overlayColorPicker" value="#061810">
-          <input type="text" class="color-text" id="overlayColorText" value="#061810">
+          <input type="color" id="overlayPicker" value="#061810">
+          <input type="text" class="color-text" id="overlayText" value="#061810">
         </div>
       </div>
+
       <div class="form-group">
         <label>Kepekatan Overlay</label>
         <div class="slider-container">
@@ -1736,14 +1749,54 @@
           <div class="slider-value" id="overlayValue">82%</div>
         </div>
       </div>
+
       <div class="form-group">
-        <label>Warna Accent (Aksen)</label>
+        <label>Warna Utama (Hijau Header & Kolom) ← YANG INI!</label>
         <div class="color-input-group">
-          <input type="color" id="accentColorPicker" value="#f4c430">
-          <input type="text" class="color-text" id="accentColorText" value="#f4c430">
+          <input type="color" id="primaryPicker" value="#1a8a6f">
+          <input type="text" class="color-text" id="primaryText" value="#1a8a6f">
+        </div>
+        <div class="color-presets" id="primaryPresets"></div>
+      </div>
+
+      <div class="form-group">
+        <label>Warna Utama Gelap (Background Header & Kolom)</label>
+        <div class="color-input-group">
+          <input type="color" id="primaryDarkPicker" value="#0d5240">
+          <input type="text" class="color-text" id="primaryDarkText" value="#0d5240">
         </div>
       </div>
-      <button class="btn btn-primary btn-block" id="saveTheme">
+
+      <div class="form-group">
+        <label>Warna Utama Terang (Aksen Garis)</label>
+        <div class="color-input-group">
+          <input type="color" id="primaryLightPicker" value="#4dd0a8">
+          <input type="text" class="color-text" id="primaryLightText" value="#4dd0a8">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Warna Accent (Kuning Aksen)</label>
+        <div class="color-input-group">
+          <input type="color" id="accentPicker" value="#f4c430">
+          <input type="text" class="color-text" id="accentText" value="#f4c430">
+        </div>
+        <div class="color-presets" id="accentPresets"></div>
+      </div>
+
+      <div class="form-group">
+        <label>Warna Accent 3 (Orange)</label>
+        <div class="color-input-group">
+          <input type="color" id="accent3Picker" value="#ff8c42">
+          <input type="text" class="color-text" id="accent3Text" value="#ff8c42">
+        </div>
+      </div>
+
+      <div class="color-preview-box" id="colorPreviewBox">
+        Preview Warna (Hijau = Primary)
+      </div>
+
+      <button class="btn btn-primary btn-block" id="saveTheme" style="margin-top: 16px;">
         <i class="fas fa-save"></i> Simpan Tema
       </button>
       <button class="btn btn-secondary btn-block" id="resetTheme" style="margin-top: 8px;">
@@ -1751,7 +1804,6 @@
       </button>
     </div>
 
-    <!-- TAB: WALLPAPER -->
     <div class="settings-section" id="tab-wallpaper">
       <div class="form-group">
         <label>Slideshow Foto (maks 3 foto)</label>
@@ -1791,7 +1843,6 @@
       </button>
     </div>
 
-    <!-- TAB: BEL SEKOLAH -->
     <div class="settings-section" id="tab-bell">
       <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px; padding: 12px; background: rgba(255, 82, 82, 0.08); border-radius: 10px; border-left: 3px solid var(--danger);">
         <i class="fas fa-info-circle"></i> Saat bell berbunyi, layar akan <strong>BERKEDIP-KEDIP</strong> sampai tombol "Hentikan" ditekan. Tiap bell bisa diisi MP3 sendiri.
@@ -1802,7 +1853,6 @@
       </button>
     </div>
 
-    <!-- TAB: ALARM LAIN -->
     <div class="settings-section" id="tab-alarm">
       <div class="form-group">
         <label>Tambah Alarm Lain</label>
@@ -1832,7 +1882,6 @@
       </button>
     </div>
 
-    <!-- TAB: JADWAL -->
     <div class="settings-section" id="tab-schedule">
       <div class="form-group">
         <label>Tambah Jadwal Kelas</label>
@@ -1884,24 +1933,24 @@
 
 <script>
 // ============================================
-// THEMES
+// THEMES (preset)
 // ============================================
 const themes = [
-  { id: 'islamic-green', name: 'Hijau Islamic', bgSolid: '#061512', bgOverlay: '#061810', primary: '#1a8a6f', primaryDark: '#0d5240', primaryLight: '#4dd0a8', accent: '#f4c430', accent2: '#ffd966', accent3: '#ff8c42', pattern1: 'rgba(26, 138, 111, 0.18)', pattern2: 'rgba(244, 196, 48, 0.12)' },
-  { id: 'royal-blue', name: 'Biru Royal', bgSolid: '#080f23', bgOverlay: '#0a1530', primary: '#2563eb', primaryDark: '#1e40af', primaryLight: '#60a5fa', accent: '#fbbf24', accent2: '#fcd34d', accent3: '#f97316', pattern1: 'rgba(37, 99, 235, 0.18)', pattern2: 'rgba(251, 191, 36, 0.12)' },
-  { id: 'royal-purple', name: 'Ungu Royal', bgSolid: '#140a23', bgOverlay: '#1a1030', primary: '#7c3aed', primaryDark: '#5b21b6', primaryLight: '#a78bfa', accent: '#fbbf24', accent2: '#fde047', accent3: '#fb7185', pattern1: 'rgba(124, 58, 237, 0.18)', pattern2: 'rgba(251, 191, 36, 0.12)' },
-  { id: 'sunset-orange', name: 'Sunset Orange', bgSolid: '#1e0f05', bgOverlay: '#2a1505', primary: '#ea580c', primaryDark: '#9a3412', primaryLight: '#fb923c', accent: '#facc15', accent2: '#fde047', accent3: '#dc2626', pattern1: 'rgba(234, 88, 12, 0.18)', pattern2: 'rgba(250, 204, 21, 0.12)' },
-  { id: 'crimson-red', name: 'Merah Crimson', bgSolid: '#1e0505', bgOverlay: '#2a0808', primary: '#dc2626', primaryDark: '#991b1b', primaryLight: '#f87171', accent: '#fbbf24', accent2: '#fcd34d', accent3: '#f97316', pattern1: 'rgba(220, 38, 38, 0.18)', pattern2: 'rgba(251, 191, 36, 0.12)' },
-  { id: 'teal-ocean', name: 'Teal Ocean', bgSolid: '#05191e', bgOverlay: '#05252a', primary: '#0d9488', primaryDark: '#115e59', primaryLight: '#5eead4', accent: '#f59e0b', accent2: '#fbbf24', accent3: '#fb7185', pattern1: 'rgba(13, 148, 136, 0.18)', pattern2: 'rgba(245, 158, 11, 0.12)' },
-  { id: 'dark-gold', name: 'Emas Gelap', bgSolid: '#140f05', bgOverlay: '#1a1508', primary: '#a16207', primaryDark: '#713f12', primaryLight: '#fde047', accent: '#facc15', accent2: '#fde047', accent3: '#ea580c', pattern1: 'rgba(161, 98, 7, 0.18)', pattern2: 'rgba(250, 204, 21, 0.12)' },
-  { id: 'midnight-indigo', name: 'Indigo Malam', bgSolid: '#0a0a1e', bgOverlay: '#0e1030', primary: '#4338ca', primaryDark: '#312e81', primaryLight: '#818cf8', accent: '#22d3ee', accent2: '#67e8f9', accent3: '#f472b6', pattern1: 'rgba(67, 56, 202, 0.18)', pattern2: 'rgba(34, 211, 238, 0.12)' }
+  { id: 'islamic-green', name: 'Hijau Islamic', bgSolid: '#061512', bgOverlay: '#061810', primary: '#1a8a6f', primaryDark: '#0d5240', primaryLight: '#4dd0a8', accent: '#f4c430', accent2: '#ffd966', accent3: '#ff8c42' },
+  { id: 'royal-blue', name: 'Biru Royal', bgSolid: '#080f23', bgOverlay: '#0a1530', primary: '#2563eb', primaryDark: '#1e40af', primaryLight: '#60a5fa', accent: '#fbbf24', accent2: '#fcd34d', accent3: '#f97316' },
+  { id: 'royal-purple', name: 'Ungu Royal', bgSolid: '#140a23', bgOverlay: '#1a1030', primary: '#7c3aed', primaryDark: '#5b21b6', primaryLight: '#a78bfa', accent: '#fbbf24', accent2: '#fde047', accent3: '#fb7185' },
+  { id: 'sunset-orange', name: 'Sunset Orange', bgSolid: '#1e0f05', bgOverlay: '#2a1505', primary: '#ea580c', primaryDark: '#9a3412', primaryLight: '#fb923c', accent: '#facc15', accent2: '#fde047', accent3: '#dc2626' },
+  { id: 'crimson-red', name: 'Merah Crimson', bgSolid: '#1e0505', bgOverlay: '#2a0808', primary: '#dc2626', primaryDark: '#991b1b', primaryLight: '#f87171', accent: '#fbbf24', accent2: '#fcd34d', accent3: '#f97316' },
+  { id: 'teal-ocean', name: 'Teal Ocean', bgSolid: '#05191e', bgOverlay: '#05252a', primary: '#0d9488', primaryDark: '#115e59', primaryLight: '#5eead4', accent: '#f59e0b', accent2: '#fbbf24', accent3: '#fb7185' },
+  { id: 'dark-gold', name: 'Emas Gelap', bgSolid: '#140f05', bgOverlay: '#1a1508', primary: '#a16207', primaryDark: '#713f12', primaryLight: '#fde047', accent: '#facc15', accent2: '#fde047', accent3: '#ea580c' },
+  { id: 'midnight-indigo', name: 'Indigo Malam', bgSolid: '#0a0a1e', bgOverlay: '#0e1030', primary: '#4338ca', primaryDark: '#312e81', primaryLight: '#818cf8', accent: '#22d3ee', accent2: '#67e8f9', accent3: '#f472b6' }
 ];
 
-const bgColorPresets = [
-  '#061512', '#080f23', '#140a23', '#1e0f05', '#1e0505',
-  '#05191e', '#140f05', '#0a0a1e', '#1a1a2e', '#000000',
-  '#0d1b2a', '#1b263b', '#0f0f1e', '#1a0b2e', '#0a1f1a'
-];
+const colorPresets = {
+  bgSolid: ['#061512', '#080f23', '#140a23', '#1e0f05', '#1e0505', '#05191e', '#140f05', '#0a0a1e', '#1a1a2e', '#000000', '#0d1b2a', '#1b263b', '#0f0f1e', '#1a0b2e', '#0a1f1a'],
+  primary: ['#1a8a6f', '#2563eb', '#7c3aed', '#ea580c', '#dc2626', '#0d9488', '#a16207', '#4338ca', '#059669', '#0891b2', '#7c2d12', '#9333ea', '#0284c7', '#16a34a', '#ca8a04'],
+  accent: ['#f4c430', '#fbbf24', '#22d3ee', '#a78bfa', '#f97316', '#10b981', '#ec4899', '#06b6d4', '#84cc16', '#f59e0b', '#ef4444', '#8b5cf6', '#14b8a6', '#facc15', '#fb7185']
+};
 
 // ============================================
 // STATE
@@ -1919,7 +1968,12 @@ const state = {
   customColors: {
     bgSolid: '#061512',
     bgOverlay: '#061810',
-    accent: '#f4c430'
+    primary: '#1a8a6f',
+    primaryDark: '#0d5240',
+    primaryLight: '#4dd0a8',
+    accent: '#f4c430',
+    accent2: '#ffd966',
+    accent3: '#ff8c42'
   },
   wallpaper: {
     type: 'preset',
@@ -2033,7 +2087,12 @@ function loadState() {
         if (!state.bells[k]) state.bells[k] = defaultBells[k];
       });
       if (!state.customColors) {
-        state.customColors = { bgSolid: '#061512', bgOverlay: '#061810', accent: '#f4c430' };
+        const t = themes[0];
+        state.customColors = {
+          bgSolid: t.bgSolid, bgOverlay: t.bgOverlay,
+          primary: t.primary, primaryDark: t.primaryDark, primaryLight: t.primaryLight,
+          accent: t.accent, accent2: t.accent2, accent3: t.accent3
+        };
       }
     } catch (e) {
       console.error('Load error', e);
@@ -2048,7 +2107,7 @@ function loadState() {
 }
 
 // ============================================
-// THEME
+// THEME APPLY - SEKARANG SEMUA WARNA BISA DIGANTI
 // ============================================
 function hexToRgb(hex) {
   const r = parseInt(hex.slice(1,3), 16);
@@ -2059,34 +2118,42 @@ function hexToRgb(hex) {
 
 function applyTheme() {
   const theme = themes.find(t => t.id === state.theme) || themes[0];
+  const c = state.customColors;
+  
   const root = document.documentElement;
   
-  // Pakai custom colors kalau ada
-  const bgSolid = state.customColors.bgSolid || theme.bgSolid;
-  const bgOverlay = state.customColors.bgOverlay || theme.bgOverlay;
-  const accent = state.customColors.accent || theme.accent;
-  
-  root.style.setProperty('--bg-solid', bgSolid);
-  root.style.setProperty('--primary', theme.primary);
-  root.style.setProperty('--primary-dark', theme.primaryDark);
-  root.style.setProperty('--primary-light', theme.primaryLight);
-  root.style.setProperty('--accent', accent);
-  root.style.setProperty('--accent-2', theme.accent2);
-  root.style.setProperty('--accent-3', theme.accent3);
+  // PAKAI CUSTOM COLORS - ini kuncinya!
+  root.style.setProperty('--bg-solid', c.bgSolid);
+  root.style.setProperty('--primary', c.primary);
+  root.style.setProperty('--primary-dark', c.primaryDark);
+  root.style.setProperty('--primary-light', c.primaryLight);
+  root.style.setProperty('--accent', c.accent);
+  root.style.setProperty('--accent-2', c.accent2);
+  root.style.setProperty('--accent-3', c.accent3);
   
   // Overlay dengan opacity
-  const overlayRgb = hexToRgb(bgOverlay);
+  const overlayRgb = hexToRgb(c.bgOverlay);
   root.style.setProperty('--bg-overlay', `rgba(${overlayRgb.r}, ${overlayRgb.g}, ${overlayRgb.b}, ${state.wallpaper.overlay / 100})`);
   
-  // Pattern
+  // Pattern menggunakan primary color
+  const primaryRgb = hexToRgb(c.primary);
+  const accentRgb = hexToRgb(c.accent);
   const pattern = document.querySelector('.pattern-overlay');
   if (pattern) {
     pattern.style.backgroundImage = 
-      `radial-gradient(circle at 15% 25%, ${theme.pattern1} 0%, transparent 40%),
-       radial-gradient(circle at 85% 75%, ${theme.pattern2} 0%, transparent 40%)`;
+      `radial-gradient(circle at 15% 25%, rgba(${primaryRgb.r}, ${primaryRgb.g}, ${primaryRgb.b}, 0.18) 0%, transparent 40%),
+       radial-gradient(circle at 85% 75%, rgba(${accentRgb.r}, ${accentRgb.g}, ${accentRgb.b}, 0.12) 0%, transparent 40%)`;
   }
   
-  document.body.style.background = bgSolid;
+  document.body.style.background = c.bgSolid;
+  
+  // Update preview box
+  const preview = document.getElementById('colorPreviewBox');
+  if (preview) {
+    preview.style.background = `linear-gradient(135deg, ${c.primaryDark}, ${c.primary})`;
+    preview.style.color = '#fff';
+    preview.textContent = 'Preview: ' + c.primary;
+  }
 }
 
 function renderThemeGrid() {
@@ -2104,10 +2171,11 @@ function renderThemeGrid() {
   `).join('');
 }
 
-function renderBgColorPresets() {
-  const container = document.getElementById('bgColorPresets');
-  container.innerHTML = bgColorPresets.map(c => 
-    `<div class="color-preset" style="background: ${c}" data-color="${c}"></div>`
+function renderColorPresets(containerId, colors, key) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = colors.map(c => 
+    `<div class="color-preset" style="background: ${c}" data-color="${c}" data-key="${key}"></div>`
   ).join('');
 }
 
@@ -2238,7 +2306,7 @@ function renderScheduleItems(schedules, currentIds, nextFirstId) {
 }
 
 // ============================================
-// BELL SYSTEM (dengan flashing effect)
+// BELL SYSTEM
 // ============================================
 function checkBells() {
   const now = new Date();
@@ -2259,8 +2327,6 @@ function checkBells() {
 
 function triggerBell(key, bell) {
   stopAlarmAudio();
-  
-  // Aktifkan flashing effect
   document.body.classList.add('bell-active');
   
   if (bell.music) {
@@ -2352,8 +2418,6 @@ function checkAlarms() {
 
 function triggerAlarm(alarm) {
   stopAlarmAudio();
-  
-  // Aktifkan flashing juga untuk alarm custom
   document.body.classList.add('bell-active');
   
   if (alarm.music) {
@@ -2415,7 +2479,6 @@ function stopAlarmAudio() {
 
 function stopAlarm() {
   stopAlarmAudio();
-  // Matikan flashing
   document.body.classList.remove('bell-active');
   document.getElementById('alarmModal').classList.remove('show');
 }
@@ -2454,7 +2517,7 @@ function updateAlarmList() {
 // ============================================
 function applyWallpaper() {
   const layer = document.getElementById('wallpaper-layer');
-  applyTheme(); // update overlay color
+  applyTheme();
   
   if (state.wallpaper.type === 'preset') {
     const preset = presetWallpapers.find(w => w.id === state.wallpaper.value);
@@ -2662,21 +2725,33 @@ function openSettings() {
   document.getElementById('slideIntervalSlider').value = state.slideshow.interval;
   document.getElementById('slideIntervalValue').textContent = state.slideshow.interval + ' dtk';
   
-  // Color inputs
-  document.getElementById('bgColorPicker').value = state.customColors.bgSolid;
-  document.getElementById('bgColorText').value = state.customColors.bgSolid;
-  document.getElementById('overlayColorPicker').value = state.customColors.bgOverlay;
-  document.getElementById('overlayColorText').value = state.customColors.bgOverlay;
-  document.getElementById('accentColorPicker').value = state.customColors.accent;
-  document.getElementById('accentColorText').value = state.customColors.accent;
+  // Color inputs - SEMUA diisi dari customColors
+  const c = state.customColors;
+  document.getElementById('bgSolidPicker').value = c.bgSolid;
+  document.getElementById('bgSolidText').value = c.bgSolid;
+  document.getElementById('overlayPicker').value = c.bgOverlay;
+  document.getElementById('overlayText').value = c.bgOverlay;
+  document.getElementById('primaryPicker').value = c.primary;
+  document.getElementById('primaryText').value = c.primary;
+  document.getElementById('primaryDarkPicker').value = c.primaryDark;
+  document.getElementById('primaryDarkText').value = c.primaryDark;
+  document.getElementById('primaryLightPicker').value = c.primaryLight;
+  document.getElementById('primaryLightText').value = c.primaryLight;
+  document.getElementById('accentPicker').value = c.accent;
+  document.getElementById('accentText').value = c.accent;
+  document.getElementById('accent3Picker').value = c.accent3;
+  document.getElementById('accent3Text').value = c.accent3;
   
   renderThemeGrid();
-  renderBgColorPresets();
+  renderColorPresets('bgSolidPresets', colorPresets.bgSolid, 'bgSolid');
+  renderColorPresets('primaryPresets', colorPresets.primary, 'primary');
+  renderColorPresets('accentPresets', colorPresets.accent, 'accent');
   renderWallpaperGrid();
   renderSlideshowGrid();
   renderBellSlots();
   updateAlarmList();
   updateScheduleListSettings();
+  applyTheme();
 }
 
 function closeSettings() {
@@ -2738,7 +2813,6 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
   });
 });
 
-// Save general
 document.getElementById('saveGeneral').addEventListener('click', () => {
   state.school.name = document.getElementById('setSchoolName').value;
   state.school.address = document.getElementById('setSchoolAddress').value;
@@ -2754,43 +2828,59 @@ document.getElementById('saveGeneral').addEventListener('click', () => {
   showToast('Pengaturan berhasil disimpan', 'success');
 });
 
-// Volume
 document.getElementById('volumeSlider').addEventListener('input', (e) => {
   state.volume = parseInt(e.target.value);
   document.getElementById('volumeValue').textContent = state.volume + '%';
 });
 
-// Overlay slider
 document.getElementById('overlaySlider').addEventListener('input', (e) => {
   state.wallpaper.overlay = parseInt(e.target.value);
   document.getElementById('overlayValue').textContent = state.wallpaper.overlay + '%';
   applyTheme();
 });
 
-// ===== TEMA =====
+// ===== TEMA - SEKARANG SEMUA COLOR PICKER AKTIF =====
 document.getElementById('themeGrid').addEventListener('click', (e) => {
   const card = e.target.closest('.theme-card');
   if (!card) return;
   state.theme = card.dataset.id;
   const theme = themes.find(t => t.id === state.theme);
-  state.customColors.bgSolid = theme.bgSolid;
-  state.customColors.bgOverlay = theme.bgOverlay;
-  state.customColors.accent = theme.accent;
+  // Update semua customColors dari tema yang dipilih
+  state.customColors = {
+    bgSolid: theme.bgSolid,
+    bgOverlay: theme.bgOverlay,
+    primary: theme.primary,
+    primaryDark: theme.primaryDark,
+    primaryLight: theme.primaryLight,
+    accent: theme.accent,
+    accent2: theme.accent2,
+    accent3: theme.accent3
+  };
   
-  document.getElementById('bgColorPicker').value = theme.bgSolid;
-  document.getElementById('bgColorText').value = theme.bgSolid;
-  document.getElementById('overlayColorPicker').value = theme.bgOverlay;
-  document.getElementById('overlayColorText').value = theme.bgOverlay;
-  document.getElementById('accentColorPicker').value = theme.accent;
-  document.getElementById('accentColorText').value = theme.accent;
+  // Update semua input warna
+  const c = state.customColors;
+  document.getElementById('bgSolidPicker').value = c.bgSolid;
+  document.getElementById('bgSolidText').value = c.bgSolid;
+  document.getElementById('overlayPicker').value = c.bgOverlay;
+  document.getElementById('overlayText').value = c.bgOverlay;
+  document.getElementById('primaryPicker').value = c.primary;
+  document.getElementById('primaryText').value = c.primary;
+  document.getElementById('primaryDarkPicker').value = c.primaryDark;
+  document.getElementById('primaryDarkText').value = c.primaryDark;
+  document.getElementById('primaryLightPicker').value = c.primaryLight;
+  document.getElementById('primaryLightText').value = c.primaryLight;
+  document.getElementById('accentPicker').value = c.accent;
+  document.getElementById('accentText').value = c.accent;
+  document.getElementById('accent3Picker').value = c.accent3;
+  document.getElementById('accent3Text').value = c.accent3;
   
   applyTheme();
   renderThemeGrid();
   saveState();
-  showToast('Tema diganti', 'success');
+  showToast('Tema diganti: ' + theme.name, 'success');
 });
 
-// Color pickers
+// Helper untuk sync color picker
 function syncColorPicker(pickerId, textId, key) {
   const picker = document.getElementById(pickerId);
   const text = document.getElementById(textId);
@@ -2810,18 +2900,38 @@ function syncColorPicker(pickerId, textId, key) {
   });
 }
 
-syncColorPicker('bgColorPicker', 'bgColorText', 'bgSolid');
-syncColorPicker('overlayColorPicker', 'overlayColorText', 'bgOverlay');
-syncColorPicker('accentColorPicker', 'accentColorText', 'accent');
+// SEMUA color picker sekarang sync dengan customColors
+syncColorPicker('bgSolidPicker', 'bgSolidText', 'bgSolid');
+syncColorPicker('overlayPicker', 'overlayText', 'bgOverlay');
+syncColorPicker('primaryPicker', 'primaryText', 'primary');
+syncColorPicker('primaryDarkPicker', 'primaryDarkText', 'primaryDark');
+syncColorPicker('primaryLightPicker', 'primaryLightText', 'primaryLight');
+syncColorPicker('accentPicker', 'accentText', 'accent');
+syncColorPicker('accent3Picker', 'accent3Text', 'accent3');
 
-document.getElementById('bgColorPresets').addEventListener('click', (e) => {
-  const preset = e.target.closest('.color-preset');
-  if (!preset) return;
-  const color = preset.dataset.color;
-  state.customColors.bgSolid = color;
-  document.getElementById('bgColorPicker').value = color;
-  document.getElementById('bgColorText').value = color;
-  applyTheme();
+// Color presets click
+document.querySelectorAll('.color-presets').forEach(container => {
+  container.addEventListener('click', (e) => {
+    const preset = e.target.closest('.color-preset');
+    if (!preset) return;
+    const color = preset.dataset.color;
+    const key = preset.dataset.key;
+    state.customColors[key] = color;
+    
+    // Update picker yang sesuai
+    const pickerMap = {
+      'bgSolid': ['bgSolidPicker', 'bgSolidText'],
+      'primary': ['primaryPicker', 'primaryText'],
+      'accent': ['accentPicker', 'accentText']
+    };
+    
+    if (pickerMap[key]) {
+      document.getElementById(pickerMap[key][0]).value = color;
+      document.getElementById(pickerMap[key][1]).value = color;
+    }
+    
+    applyTheme();
+  });
 });
 
 document.getElementById('saveTheme').addEventListener('click', () => {
@@ -2835,21 +2945,37 @@ document.getElementById('resetTheme').addEventListener('click', () => {
   state.customColors = {
     bgSolid: theme.bgSolid,
     bgOverlay: theme.bgOverlay,
-    accent: theme.accent
+    primary: theme.primary,
+    primaryDark: theme.primaryDark,
+    primaryLight: theme.primaryLight,
+    accent: theme.accent,
+    accent2: theme.accent2,
+    accent3: theme.accent3
   };
   state.wallpaper.overlay = 82;
   document.getElementById('overlaySlider').value = 82;
   document.getElementById('overlayValue').textContent = '82%';
-  document.getElementById('bgColorPicker').value = theme.bgSolid;
-  document.getElementById('bgColorText').value = theme.bgSolid;
-  document.getElementById('overlayColorPicker').value = theme.bgOverlay;
-  document.getElementById('overlayColorText').value = theme.bgOverlay;
-  document.getElementById('accentColorPicker').value = theme.accent;
-  document.getElementById('accentColorText').value = theme.accent;
+  
+  const c = state.customColors;
+  document.getElementById('bgSolidPicker').value = c.bgSolid;
+  document.getElementById('bgSolidText').value = c.bgSolid;
+  document.getElementById('overlayPicker').value = c.bgOverlay;
+  document.getElementById('overlayText').value = c.bgOverlay;
+  document.getElementById('primaryPicker').value = c.primary;
+  document.getElementById('primaryText').value = c.primary;
+  document.getElementById('primaryDarkPicker').value = c.primaryDark;
+  document.getElementById('primaryDarkText').value = c.primaryDark;
+  document.getElementById('primaryLightPicker').value = c.primaryLight;
+  document.getElementById('primaryLightText').value = c.primaryLight;
+  document.getElementById('accentPicker').value = c.accent;
+  document.getElementById('accentText').value = c.accent;
+  document.getElementById('accent3Picker').value = c.accent3;
+  document.getElementById('accent3Text').value = c.accent3;
+  
   applyTheme();
   renderThemeGrid();
   saveState();
-  showToast('Tema direset', 'success');
+  showToast('Tema direset ke default', 'success');
 });
 
 // ===== WALLPAPER =====
